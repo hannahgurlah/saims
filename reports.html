@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reports | School Inventory System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Work+Sans:wght@400;500;600&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <div class="page-shell">
+    <nav class="top-nav">
+      <a class="nav-brand" href="index.html">
+        <img src="asset/logo.svg" alt="Landahan ES Inventory logo">
+        <span>Landahan ES Inventory</span>
+      </a>
+      <div class="nav-links">
+        <a href="teachers.html">Teaching/Non-Teaching Personnel</a>
+        <a href="inventory-item.html">Inventory Item</a>
+        <a href="inventory-list.html">Inventory Listing</a>
+        <a href="stock-card.html">Stock Card</a>
+        <a class="active" href="reports.html">Reports</a>
+      </div>
+    </nav>
+
+    <header class="page-header">
+      <p class="eyebrow">Reports</p>
+      <h1 class="page-title">Reports</h1>
+      <p class="hero-copy">Access report-ready views and exports for inventory, consumables, and personnel records.</p>
+    </header>
+
+    <main class="grid">
+      <section class="panel panel-wide nav-panel">
+        <p class="section-kicker">PPE</p>
+        <h2>Report on the Physical Count of Property, Plant and Equipment</h2>
+        <p class="hero-copy compact-copy">Download all PPE items in CSV format for physical count reporting.</p>
+        <button id="downloadPpeReportBtn" class="primary-btn nav-btn" type="button">Download RPCPPE Report</button>
+      </section>
+
+      <section class="panel panel-wide nav-panel">
+        <p class="section-kicker">Semi-Expendable</p>
+        <h2>Report on the Physical Count of Semi-Expendable Property (RPCSP)</h2>
+        <p class="hero-copy compact-copy">Download all Semi-Expendable items in CSV format for physical count reporting.
+        </p>
+        <button id="downloadSemiExpendableReportBtn" class="primary-btn nav-btn" type="button">Download RPCSP
+          Report</button>
+      </section>
+
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+
+</html>

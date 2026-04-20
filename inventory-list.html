@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inventory Listing | School Inventory System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Work+Sans:wght@400;500;600&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <div class="page-shell">
+    <nav class="top-nav">
+      <a class="nav-brand" href="index.html">
+        <img src="asset/logo.svg" alt="Landahan ES Inventory logo">
+        <span>Landahan ES Inventory</span>
+      </a>
+      <div class="nav-links">
+        <a href="teachers.html">Teaching/Non-Teaching Personnel</a>
+        <a href="inventory-item.html">Inventory Item</a>
+        <a class="active" href="inventory-list.html">Inventory Listing</a>
+        <a href="stock-card.html">Stock Card</a>
+        <a href="reports.html">Reports</a>
+      </div>
+    </nav>
+
+    <header class="page-header">
+      <p class="eyebrow">Records</p>
+      <h1 class="page-title">Inventory Listing</h1>
+      <p class="hero-copy">Review all inventory records, filter the list, and edit or delete each item from the popup
+        modal.</p>
+    </header>
+
+    <main>
+      <section class="panel panel-wide">
+        <div class="panel-heading split">
+          <div>
+            <p class="section-kicker">Records</p>
+            <h2>Inventory List</h2>
+          </div>
+          <button id="downloadCsvBtn" class="primary-btn" type="button">Download CSV</button>
+        </div>
+
+        <div class="panel-heading">
+          <div class="filter-bar">
+            <label>
+              <span>Status</span>
+              <select id="filterStatus">
+                <option value="All">All Statuses</option>
+                <option value="Assigned">Assigned</option>
+                <option value="Available">Available</option>
+                <option value="Maintenance">Maintenance</option>
+                <option value="Retired">For Repair / Not Working</option>
+              </select>
+            </label>
+            <label>
+              <span>Teacher</span>
+              <select id="filterTeacher">
+                <option value="All">All Personnel</option>
+              </select>
+            </label>
+            <label>
+              <span>Item Type</span>
+              <select id="filterItemType">
+                <option value="All">All Item Types</option>
+                <option value="PPE">Property, Plant, and Equipment (PPE)</option>
+                <option value="Semi-Expandable">Semi-Expendable Property</option>
+                <option value="Not Expandable">Consumables/Non Property Items</option>
+              </select>
+            </label>
+            <label>
+              <span>Search</span>
+              <input type="search" id="searchInput" placeholder="Property number, item, location...">
+            </label>
+          </div>
+        </div>
+        <div id="inventoryTableWrap" class="table-wrap"></div>
+      </section>
+    </main>
+  </div>
+
+  <div id="editModal" class="modal-backdrop hidden">
+    <div class="modal-card">
+      <div class="panel-heading split modal-heading">
+        <div>
+          <p class="section-kicker">Inventory</p>
+          <h2>Edit Item</h2>
+        </div>
+        <button id="closeModalBtn" class="ghost-btn" type="button">Close</button>
+      </div>
+      <form id="editInventoryForm" class="stack-form">
+        <div class="input-grid">
+          <label>
+            <span>Item Name</span>
+            <input type="text" id="editItemName" required>
+          </label>
+          <label>
+            <span>Category</span>
+            <select id="editItemCategory" required>
+              <option value="">Select category</option>
+              <option value="Appliances">Appliances</option>
+              <option value="Audio-Visual Equipment">Audio-Visual Equipment</option>
+              <option value="Building Improvements">Building Improvements</option>
+              <option value="Buildings">Buildings</option>
+              <option value="Classroom Furniture">Classroom Furniture</option>
+              <option value="Cleaning Supplies">Cleaning Supplies</option>
+              <option value="DRRM Equipment">DRRM Equipment</option>
+              <option value="Electrical Supplies">Electrical Supplies</option>
+              <option value="Fixtures">Fixtures</option>
+              <option value="ICT Equipment">ICT Equipment</option>
+              <option value="Instructional Materials">Instructional Materials</option>
+              <option value="Kitchen Equipment">Kitchen Equipment</option>
+              <option value="Laboratory Equipment">Laboratory Equipment</option>
+              <option value="Land">Land</option>
+              <option value="Land Improvements">Land Improvements</option>
+              <option value="Library Books">Library Books</option>
+              <option value="Medical Supplies">Medical Supplies</option>
+              <option value="Office Furniture">Office Furniture</option>
+              <option value="Office Supplies">Office Supplies</option>
+              <option value="Other School Property">Other School Property</option>
+              <option value="School Supplies">School Supplies</option>
+              <option value="Science Equipment">Science Equipment</option>
+              <option value="Sports Equipment">Sports Equipment</option>
+              <option value="Textbooks">Textbooks</option>
+              <option value="Tools and Equipment">Tools and Equipment</option>
+            </select>
+          </label>
+          <label>
+            <span>Description</span>
+            <input type="text" id="editItemDescription" required>
+          </label>
+          <label>
+            <span>Property Number</span>
+            <input type="text" id="editItemTag" required>
+          </label>
+          <label>
+            <span>Quantity</span>
+            <input type="number" id="editItemQuantity" min="1" required>
+          </label>
+          <label>
+            <span>Quantity per Property Card</span>
+            <input type="number" id="editItemQuantityPerPropertyCard" min="0" required>
+          </label>
+          <label>
+            <span>Quantity per Physical Count</span>
+            <input type="number" id="editItemQuantityPerPhysicalCount" min="0" required>
+          </label>
+          <label>
+            <span>No. of Usable</span>
+            <input type="number" id="editItemUsableCount" min="0" required>
+          </label>
+          <label>
+            <span>No. of Non-usable</span>
+            <input type="number" id="editItemNonUsableCount" min="0" required>
+          </label>
+          <label>
+            <span>Unit of Measurement</span>
+            <input type="text" id="editItemUnit" required>
+          </label>
+          <label>
+            <span>Price per Item</span>
+            <input type="number" id="editItemAmount" min="0" step="0.01" required>
+          </label>
+          <label>
+            <span>Total Amount</span>
+            <input type="number" id="editItemTotalAmount" min="0" step="0.01" readonly>
+          </label>
+          <label>
+            <span>UACS Code</span>
+            <input type="text" id="editItemUacsCode" required>
+          </label>
+          <label>
+            <span>Fund Cluster Code</span>
+            <input type="text" id="editItemFundClusterCode" required>
+          </label>
+          <label>
+            <span>ICS Number (Source)</span>
+            <input type="text" id="editItemIcsNumberSource">
+          </label>
+          <label>
+            <span>ICS Number (Distribute)</span>
+            <input type="text" id="editItemIcsNumberDistribute">
+          </label>
+          <label class="full-width">
+            <span>Reference Number (OR Number/Purchased Details / Delivery Receipt)</span>
+            <input type="text" id="editItemReferenceNumber">
+          </label>
+          <label>
+            <span>Type of Item</span>
+            <select id="editItemAssetType" required>
+              <option value="Not Expandable">Consumables/Non Property Items</option>
+              <option value="PPE">Property, Plant, and Equipment (PPE)</option>
+              <option value="Semi-Expandable">Semi-Expendable Property</option>
+            </select>
+          </label>
+          <label>
+            <span>Acquired</span>
+            <select id="editItemAcquiredType" required>
+              <option value="Donated">Donated</option>
+              <option value="Not Applicable">Not Applicable</option>
+              <option value="Purchase">Purchase</option>
+            </select>
+          </label>
+          <label id="editItemAcquiredDetailsWrap">
+            <span id="editItemAcquiredDetailsLabel">Store/Establishment Purchased</span>
+            <input type="text" id="editItemAcquiredDetails" placeholder="Enter store or donor name">
+          </label>
+          <label>
+            <span>Room / Location</span>
+            <input type="text" id="editItemLocation" required>
+          </label>
+          <label>
+            <span>Status</span>
+            <select id="editItemStatus" required>
+              <option value="Assigned">Assigned</option>
+              <option value="Maintenance">Maintenance</option>
+              <option value="Available">Available</option>
+              <option value="Retired">For Repair / Not Working</option>
+            </select>
+          </label>
+          <label>
+            <span>Assigned Personnel</span>
+            <select id="editItemTeacher">
+              <option value="">Unassigned</option>
+            </select>
+          </label>
+          <label>
+            <span>Date Assigned</span>
+            <input type="date" id="editItemAssignedDate">
+          </label>
+          <label class="full-width">
+            <span>Notes</span>
+            <textarea id="editItemNotes" rows="4"></textarea>
+          </label>
+        </div>
+        <button type="submit" class="primary-btn">Save Changes</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+
+</html>

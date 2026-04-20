@@ -1,0 +1,4 @@
+id,name,category,asset_tag,quantity,amount,uacs_code,fund_cluster_code,asset_type,location,status,assigned_date,notes,teacher_id,last_name,first_name,middle_name,suffix_name,teacher_department,teacher_position,teacher_email
+item-lcd-projector,LCD Projector,ICT Equipment,SCH-ICT-001,1,24500.0,10605030,101,PPE,Room 204,Assigned,2026-04-08,Installed with HDMI cable and ceiling mount.,teacher-maria-santos,Santos,Maria,,,Science,Teacher III,maria.santos@school.edu
+item-microscope-set,Microscope Set,Laboratory,SCH-LAB-014,12,18000.0,10605070,101,Semi-Expandable,Science Lab,Available,,Stored in cabinet B.,,,,,,,,
+item-teacher-laptop,Teacher Laptop,Computers,SCH-CMP-022,1,32000.0,10605020,101,PPE,Faculty Room,Assigned,2026-04-08,Issued with charger and laptop bag.,teacher-daniel-cruz,Cruz,Daniel,,,Mathematics,Teacher II,daniel.cruz@school.edu

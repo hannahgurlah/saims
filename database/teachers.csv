@@ -1,0 +1,3 @@
+id,last_name,first_name,middle_name,suffix_name,department,current_position,email,date_of_birth,date_hired_toledo,date_hired_government,gsis_number,philhealth_number,tin_number,pagibig_number,sss_number,civil_status,gender,created_at,updated_at
+teacher-maria-santos,Santos,Maria,,,Science,Teacher III,maria.santos@school.edu,,,,,,,,,Single,Female,2026-04-08 00:59:37,2026-04-08 00:59:37
+teacher-daniel-cruz,Cruz,Daniel,,,Mathematics,Teacher II,daniel.cruz@school.edu,,,,,,,,,Single,Male,2026-04-08 00:59:37,2026-04-08 00:59:37
