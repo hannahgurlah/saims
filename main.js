@@ -1,7 +1,15 @@
 const state = {
+  auth: {
+    authenticated: false,
+    username: "",
+  },
   teachers: [],
   inventory: [],
 };
+
+const navLinks = document.querySelector(".nav-links");
+const loginForm = document.querySelector("#loginForm");
+const loginError = document.querySelector("#loginError");
 
 const teacherForm = document.querySelector("#teacherForm");
 const teacherList = document.querySelector("#teacherList");
@@ -42,6 +50,8 @@ const stockCardItemSummary = document.querySelector("#stockCardItemSummary");
 const stockMovementTableWrap = document.querySelector("#stockMovementTableWrap");
 
 const heroStats = document.querySelector("#heroStats");
+const isHomePage = window.location.pathname.endsWith("/index.html") || window.location.pathname === "/" || window.location.pathname.endsWith("index.html");
+const isLoginPage = window.location.pathname.endsWith("/login.html") || window.location.pathname.endsWith("login.html");
 const isStockCardPage = window.location.pathname.endsWith("/stock-card.html") || window.location.pathname.endsWith("stock-card.html");
 const isInventoryItemPage = window.location.pathname.endsWith("/inventory-item.html") || window.location.pathname.endsWith("inventory-item.html");
 const isInventoryListPage = window.location.pathname.endsWith("/inventory-list.html") || window.location.pathname.endsWith("inventory-list.html");
@@ -70,6 +80,7 @@ const editItemAcquiredType = document.querySelector("#editItemAcquiredType");
 const editItemAcquiredDetailsWrap = document.querySelector("#editItemAcquiredDetailsWrap");
 const editItemAcquiredDetailsLabel = document.querySelector("#editItemAcquiredDetailsLabel");
 const editItemAcquiredDetailsInput = document.querySelector("#editItemAcquiredDetails");
+const requiresAuthPage = !isHomePage && !isLoginPage;
 
 let editingItemId = "";
 let editingTeacherId = "";
@@ -245,15 +256,42 @@ if (downloadSemiExpendableReportBtn) {
   downloadSemiExpendableReportBtn.addEventListener("click", downloadSemiExpendableReportCsv);
 }
 
+if (loginForm) {
+  loginForm.addEventListener("submit", handleLoginSubmit);
+}
+
 initializeApp();
 
 async function initializeApp() {
   try {
+    await refreshSession();
+    renderAuthNav();
+
+    if (isLoginPage) {
+      if (state.auth.authenticated) {
+        window.location.replace(getPostLoginDestination());
+      }
+      return;
+    }
+
+    if (requiresAuthPage && !state.auth.authenticated) {
+      redirectToLogin();
+      return;
+    }
+
     await refreshData();
   } catch (error) {
     console.error(error);
-    renderErrorState("Unable to load data from the database.");
+    renderErrorState(state.auth.authenticated ? "Unable to load data from the database." : "Please log in to continue.");
   }
+}
+
+async function refreshSession() {
+  const session = await apiFetch("/api/auth/session", {}, { allowUnauthorized: true });
+  state.auth = {
+    authenticated: Boolean(session && session.authenticated),
+    username: session && session.username ? session.username : "",
+  };
 }
 
 async function refreshData() {
@@ -282,6 +320,14 @@ async function apiFetch(path, options = {}) {
   });
 
   if (!response.ok) {
+    if (response.status === 401) {
+      if (!isLoginPage) {
+        redirectToLogin();
+      }
+
+      throw new Error("Authentication required");
+    }
+
     const message = await response.text();
     throw new Error(message || `Request failed: ${response.status}`);
   }
@@ -294,6 +340,7 @@ async function apiFetch(path, options = {}) {
 }
 
 function render() {
+  renderAuthNav();
   renderStats();
   renderTeacherSelects();
   renderTeachers();
@@ -301,6 +348,111 @@ function render() {
   renderStockCardItemPage();
   updateCreateTotalAmount();
   updateAcquiredDetailsUI("");
+}
+
+function renderAuthNav() {
+  if (!navLinks) {
+    return;
+  }
+
+  const existingSlot = navLinks.querySelector(".nav-auth-slot");
+
+  if (existingSlot) {
+    existingSlot.remove();
+  }
+
+  const slot = document.createElement("div");
+  slot.className = "nav-auth-slot";
+
+  if (state.auth.authenticated) {
+    const userLabel = document.createElement("span");
+    userLabel.className = "nav-user-label";
+    userLabel.textContent = state.auth.username;
+
+    const logoutButton = document.createElement("button");
+    logoutButton.className = "ghost-btn nav-logout-btn";
+    logoutButton.type = "button";
+    logoutButton.textContent = "Logout";
+    logoutButton.addEventListener("click", handleLogoutClick);
+
+    slot.append(userLabel, logoutButton);
+  } else {
+    const loginLink = document.createElement("a");
+    loginLink.href = "login.html";
+    loginLink.textContent = "Login";
+
+    if (isLoginPage) {
+      loginLink.className = "active";
+    }
+
+    slot.append(loginLink);
+  }
+
+  navLinks.append(slot);
+}
+
+async function handleLoginSubmit(event) {
+  event.preventDefault();
+
+  const username = document.querySelector("#loginUsername").value.trim();
+  const password = document.querySelector("#loginPassword").value;
+
+  try {
+    hideLoginError();
+    await apiFetch("/api/auth/login", {
+      method: "POST",
+      body: JSON.stringify({ username, password }),
+    });
+    await refreshSession();
+    window.location.replace(getPostLoginDestination());
+  } catch (error) {
+    console.error(error);
+    showLoginError("Invalid username or password.");
+  }
+}
+
+async function handleLogoutClick() {
+  try {
+    await apiFetch("/api/auth/logout", {
+      method: "POST",
+    });
+  } catch (error) {
+    console.error(error);
+  }
+
+  state.auth = {
+    authenticated: false,
+    username: "",
+  };
+  redirectToLogin();
+}
+
+function redirectToLogin() {
+  const next = `${window.location.pathname}${window.location.search || ""}`;
+  window.location.replace(`login.html?next=${encodeURIComponent(next)}`);
+}
+
+function getPostLoginDestination() {
+  const next = new URLSearchParams(window.location.search).get("next");
+  return next || "index.html";
+}
+
+function showLoginError(message) {
+  if (!loginError) {
+    return;
+  }
+
+  loginError.textContent = message;
+  loginError.classList.remove("hidden");
+}
+
+function hideLoginError() {
+  if (!loginError) {
+    return;
+  }
+
+  loginError.textContent = "";
+  loginError.classList.add("hidden");
 }
 
 function renderStats() {

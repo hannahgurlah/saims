@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teaching/Non-Teaching Personnel | School Inventory System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="page-shell">
+    <nav class="top-nav">
+      <a class="nav-brand" href="index.html">
+        <img src="asset/logo.svg" alt="Landahan ES Inventory logo">
+        <span>Landahan ES Inventory</span>
+      </a>
+      <div class="nav-links">
+        <a class="active" href="teachers.html">Teaching/Non-Teaching Personnel</a>
+        <a href="inventory-item.html">Inventory Item</a>
+        <a href="inventory-list.html">Inventory Listing</a>
+        <a href="stock-card.html">Stock Card</a>
+        <a href="reports.html">Reports</a>
+      </div>
+    </nav>
+
+    <header class="page-header">
+      <p class="eyebrow">Personnel</p>
+      <h1 class="page-title">Teaching/Non-Teaching Personnel Listing</h1>
+      <p class="hero-copy">Create and manage personnel records that can be linked to assigned school inventory items.</p>
+    </header>
+
+    <main>
+      <section class="panel">
+        <div class="panel-heading split">
+          <div>
+            <p class="section-kicker">Personnel</p>
+            <h2>Teaching/Non-Teaching Personnel</h2>
+          </div>
+          <div class="table-actions">
+            <button id="downloadTeachersCsvBtn" class="primary-btn" type="button">Download CSV</button>
+            <button id="openTeacherModalBtn" class="primary-btn" type="button">Add Personnel</button>
+          </div>
+        </div>
+        <div id="teacherList" class="card-list"></div>
+      </section>
+    </main>
+  </div>
+
+  <div id="addTeacherModal" class="modal-backdrop hidden">
+    <div class="modal-card">
+      <div class="panel-heading split modal-heading">
+        <div>
+          <p class="section-kicker">Personnel</p>
+          <h2>Add Personnel</h2>
+        </div>
+        <button id="closeAddTeacherModalBtn" class="ghost-btn" type="button">Close</button>
+      </div>
+      <form id="teacherForm" class="stack-form">
+          <div class="input-grid">
+            <label>
+              <span>Last Name</span>
+              <input type="text" id="teacherLastName" placeholder="e.g. Santos" required>
+            </label>
+            <label>
+              <span>First Name</span>
+              <input type="text" id="teacherFirstName" placeholder="e.g. Maria" required>
+            </label>
+            <label>
+              <span>Middle Name</span>
+              <input type="text" id="teacherMiddleName" placeholder="e.g. Cruz">
+            </label>
+            <label>
+              <span>Suffix Name</span>
+              <input type="text" id="teacherSuffixName" placeholder="e.g. Jr.">
+            </label>
+            <label>
+              <span>Department</span>
+              <input type="text" id="teacherDepartment" placeholder="e.g. Science" required>
+            </label>
+            <label>
+              <span>Current Position</span>
+              <select id="teacherCurrentPosition" required>
+                <option value="ADAS I">ADAS I</option>
+                <option value="ADAS II">ADAS II</option>
+                <option value="Administrative Officer II">Administrative Officer II</option>
+                <option value="Job Order">Job Order</option>
+                <option value="Master Teacher I">Master Teacher I</option>
+                <option value="Master Teacher II">Master Teacher II</option>
+                <option value="Principal I">Principal I</option>
+                <option value="Principal II">Principal II</option>
+                <option value="Teacher I">Teacher I</option>
+                <option value="Teacher II">Teacher II</option>
+                <option value="Teacher III">Teacher III</option>
+                <option value="Teacher IV">Teacher IV</option>
+                <option value="Teacher V">Teacher V</option>
+                <option value="Teacher VI">Teacher VI</option>
+              </select>
+            </label>
+            <label>
+              <span>Email</span>
+              <input type="email" id="teacherEmail" placeholder="teacher@school.edu">
+            </label>
+            <label>
+              <span>Date of Birth</span>
+              <input type="date" id="teacherDateOfBirth">
+            </label>
+            <label>
+              <span>Date Hired in Toledo City Division</span>
+              <input type="date" id="teacherDateHiredToledo">
+            </label>
+            <label>
+              <span>Date Hired in Government</span>
+              <input type="date" id="teacherDateHiredGovernment">
+            </label>
+            <label>
+              <span>GSIS Number</span>
+              <input type="text" id="teacherGsisNumber" placeholder="e.g. 1234567890">
+            </label>
+            <label>
+              <span>PhilHealth Number</span>
+              <input type="text" id="teacherPhilhealthNumber" placeholder="e.g. 12-345678901-2">
+            </label>
+            <label>
+              <span>TIN Number</span>
+              <input type="text" id="teacherTinNumber" placeholder="e.g. 123-456-789-000">
+            </label>
+            <label>
+              <span>Pag-IBIG</span>
+              <input type="text" id="teacherPagibigNumber" placeholder="e.g. 1234-5678-9012">
+            </label>
+            <label>
+              <span>SSS Number</span>
+              <input type="text" id="teacherSssNumber" placeholder="e.g. 12-3456789-0">
+            </label>
+            <label>
+              <span>Civil Status</span>
+              <select id="teacherCivilStatus" required>
+                <option value="Married">Married</option>
+                <option value="Separated">Separated</option>
+                <option value="Single">Single</option>
+                <option value="Widowed">Widowed</option>
+              </select>
+            </label>
+            <label>
+              <span>Gender</span>
+              <select id="teacherGender" required>
+                <option value="Female">Female</option>
+                <option value="Male">Male</option>
+                <option value="Prefer not to say">Prefer not to say</option>
+              </select>
+            </label>
+          </div>
+          <button type="submit" class="primary-btn">Add Personnel</button>
+        </form>
+    </div>
+  </div>
+
+  <template id="teacherCardTemplate">
+    <article class="teacher-card">
+      <div>
+        <h3></h3>
+        <p class="teacher-meta"></p>
+      </div>
+      <div class="teacher-side">
+        <span class="pill"></span>
+        <div class="teacher-actions">
+          <button class="primary-btn teacher-action-btn" type="button" data-action="edit-teacher">Edit</button>
+          <button class="ghost-btn teacher-action-btn" type="button" data-action="delete-teacher">Remove</button>
+        </div>
+      </div>
+    </article>
+  </template>
+
+  <div id="editTeacherModal" class="modal-backdrop hidden">
+    <div class="modal-card">
+      <div class="panel-heading split modal-heading">
+        <div>
+          <p class="section-kicker">Personnel</p>
+          <h2>Edit Teacher</h2>
+        </div>
+        <button id="closeTeacherModalBtn" class="ghost-btn" type="button">Close</button>
+      </div>
+      <form id="editTeacherForm" class="stack-form">
+        <div class="input-grid">
+          <label>
+            <span>Last Name</span>
+            <input type="text" id="editTeacherLastName" required>
+          </label>
+          <label>
+            <span>First Name</span>
+            <input type="text" id="editTeacherFirstName" required>
+          </label>
+          <label>
+            <span>Middle Name</span>
+            <input type="text" id="editTeacherMiddleName">
+          </label>
+          <label>
+            <span>Suffix Name</span>
+            <input type="text" id="editTeacherSuffixName">
+          </label>
+          <label>
+            <span>Department</span>
+            <input type="text" id="editTeacherDepartment" required>
+          </label>
+          <label>
+              <span>Current Position</span>
+              <select id="editTeacherCurrentPosition" required>
+              <option value="ADAS I">ADAS I</option>
+              <option value="ADAS II">ADAS II</option>
+              <option value="Administrative Officer II">Administrative Officer II</option>
+              <option value="Job Order">Job Order</option>
+              <option value="Master Teacher I">Master Teacher I</option>
+              <option value="Master Teacher II">Master Teacher II</option>
+              <option value="Principal I">Principal I</option>
+              <option value="Principal II">Principal II</option>
+              <option value="Teacher I">Teacher I</option>
+              <option value="Teacher II">Teacher II</option>
+              <option value="Teacher III">Teacher III</option>
+              <option value="Teacher IV">Teacher IV</option>
+              <option value="Teacher V">Teacher V</option>
+              <option value="Teacher VI">Teacher VI</option>
+            </select>
+          </label>
+          <label>
+            <span>Email</span>
+            <input type="email" id="editTeacherEmail">
+          </label>
+          <label>
+            <span>Date of Birth</span>
+            <input type="date" id="editTeacherDateOfBirth">
+          </label>
+          <label>
+            <span>Date Hired in Toledo City Division</span>
+            <input type="date" id="editTeacherDateHiredToledo">
+          </label>
+          <label>
+            <span>Date Hired in Government</span>
+            <input type="date" id="editTeacherDateHiredGovernment">
+          </label>
+          <label>
+            <span>GSIS Number</span>
+            <input type="text" id="editTeacherGsisNumber">
+          </label>
+          <label>
+            <span>PhilHealth Number</span>
+            <input type="text" id="editTeacherPhilhealthNumber">
+          </label>
+          <label>
+            <span>TIN Number</span>
+            <input type="text" id="editTeacherTinNumber">
+          </label>
+          <label>
+            <span>Pag-IBIG</span>
+            <input type="text" id="editTeacherPagibigNumber">
+          </label>
+          <label>
+            <span>SSS Number</span>
+            <input type="text" id="editTeacherSssNumber">
+          </label>
+          <label>
+            <span>Civil Status</span>
+            <select id="editTeacherCivilStatus" required>
+              <option value="Married">Married</option>
+              <option value="Separated">Separated</option>
+              <option value="Single">Single</option>
+              <option value="Widowed">Widowed</option>
+            </select>
+          </label>
+          <label>
+            <span>Gender</span>
+            <select id="editTeacherGender" required>
+              <option value="Female">Female</option>
+              <option value="Male">Male</option>
+              <option value="Prefer not to say">Prefer not to say</option>
+            </select>
+          </label>
+        </div>
+        <button type="submit" class="primary-btn">Save Changes</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="main.js"></script>
+</body>
+</html>

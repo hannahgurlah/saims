@@ -1,19 +1,18 @@
 # Database
 
-This folder contains the SQLite database setup for the school inventory system.
+This folder now contains both the legacy SQLite files and the new PostgreSQL schema used for Vercel deployment.
 
 Files:
-- `schema.sql`: Creates the `teachers` and `inventory_items` tables plus the `inventory_listing` view.
-- `seed.sql`: Inserts sample teachers and inventory records.
-- `landahan.db`: Generated SQLite database file.
-
-The app now uses this database through the local Node server in `/server.js`.
+- `schema.sql`: Legacy SQLite schema
+- `seed.sql`: Legacy SQLite seed data
+- `landahan.db`: Local SQLite snapshot and migration source
+- `postgres-schema.sql`: PostgreSQL schema used by the Vercel-ready API
 
 Useful commands:
 
 ```bash
-sqlite3 database/landahan.db < database/schema.sql
-sqlite3 database/landahan.db < database/seed.sql
 sqlite3 database/landahan.db "SELECT * FROM inventory_listing;"
-npm start
+npm run migrate:postgres
 ```
+
+The deployed app uses PostgreSQL through the shared backend modules in `lib/` and the serverless entry point in `api/router.js`.

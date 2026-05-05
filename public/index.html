@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>School Inventory System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Work+Sans:wght@400;500;600&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <div class="page-shell">
+    <nav class="top-nav">
+      <a class="nav-brand active" href="index.html">
+        <img src="asset/logo.svg" alt="Landahan ES Inventory logo">
+        <span>Landahan ES Inventory</span>
+      </a>
+      <div class="nav-links">
+        <a href="teachers.html">Teaching/Non-Teaching Personnel</a>
+        <a href="inventory-item.html">Inventory Item</a>
+        <a href="inventory-list.html">Inventory Listing</a>
+        <a href="stock-card.html">Stock Card</a>
+        <a href="reports.html">Reports</a>
+      </div>
+    </nav>
+
+    <header class="hero">
+      <div>
+        <p class="eyebrow">School Asset Tracking</p>
+        <h1>Efficient Tracking, Smarter School Management</h1>
+        <p class="hero-copy">
+          Use the dedicated pages below to manage assigned teachers, create inventory items, and review the full listing
+          with edit and delete actions.
+        </p>
+      </div>
+      <div class="hero-card">
+        <p class="hero-card-label">Live Summary</p>
+        <div class="hero-stats" id="heroStats"></div>
+      </div>
+    </header>
+
+    <main class="grid">
+      <section class="panel nav-panel">
+        <p class="section-kicker">Personnel</p>
+        <h2>Personnel Page</h2>
+        <p class="hero-copy compact-copy">Add teachers, see their department details, and track how many assets are
+          assigned to each one.</p>
+        <a class="primary-btn nav-btn" href="teachers.html">Open Personnel</a>
+      </section>
+
+      <section class="panel nav-panel">
+        <p class="section-kicker">Assets</p>
+        <h2>Inventory Item Page</h2>
+        <p class="hero-copy compact-copy">Create new inventory records with amount, UACS code, fund cluster code, and
+          asset type.</p>
+        <a class="primary-btn nav-btn" href="inventory-item.html">Open Item Form</a>
+      </section>
+
+      <section class="panel panel-wide nav-panel">
+        <p class="section-kicker">Records</p>
+        <h2>Inventory Listing Page</h2>
+        <p class="hero-copy compact-copy">Browse all items, filter the list, and open the edit modal or delete items
+          from the inventory table.</p>
+        <a class="primary-btn nav-btn" href="inventory-list.html">Open Listing</a>
+      </section>
+
+      <section class="panel panel-wide nav-panel">
+        <p class="section-kicker">Consumables</p>
+        <h2>Stock Card Page</h2>
+        <p class="hero-copy compact-copy">View consumable and non-property items in a separate stock card listing for quicker monitoring.</p>
+        <a class="primary-btn nav-btn" href="stock-card.html">Open Stock Card</a>
+      </section>
+
+      <section class="panel panel-wide nav-panel">
+        <p class="section-kicker">Reports</p>
+        <h2>Reports Page</h2>
+        <p class="hero-copy compact-copy">Open report-ready pages for inventory, stock card, and personnel records.</p>
+        <a class="primary-btn nav-btn" href="reports.html">Open Reports</a>
+      </section>
+    </main>
+  </div>
+
+  <script src="main.js"></script>
+</body>
+
+</html>

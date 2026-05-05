@@ -1,0 +1,17 @@
+{
+  "functions": {
+    "server.js": {
+      "includeFiles": "public/**"
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/api",
+      "destination": "/api/router"
+    },
+    {
+      "source": "/api/:path*",
+      "destination": "/api/router?path=:path*"
+    }
+  ]
+}
