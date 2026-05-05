@@ -80,8 +80,6 @@ const editItemAcquiredType = document.querySelector("#editItemAcquiredType");
 const editItemAcquiredDetailsWrap = document.querySelector("#editItemAcquiredDetailsWrap");
 const editItemAcquiredDetailsLabel = document.querySelector("#editItemAcquiredDetailsLabel");
 const editItemAcquiredDetailsInput = document.querySelector("#editItemAcquiredDetails");
-const requiresAuthPage = !isHomePage && !isLoginPage;
-
 let editingItemId = "";
 let editingTeacherId = "";
 let stockMovementItemId = "";
@@ -274,11 +272,6 @@ async function initializeApp() {
       return;
     }
 
-    if (requiresAuthPage && !state.auth.authenticated) {
-      redirectToLogin();
-      return;
-    }
-
     await refreshData();
   } catch (error) {
     console.error(error);
@@ -287,7 +280,7 @@ async function initializeApp() {
 }
 
 async function refreshSession() {
-  const session = await apiFetch("/api/auth/session", {}, { allowUnauthorized: true });
+  const session = await apiFetch("/api/auth/session");
   state.auth = {
     authenticated: Boolean(session && session.authenticated),
     username: session && session.username ? session.username : "",
@@ -321,10 +314,6 @@ async function apiFetch(path, options = {}) {
 
   if (!response.ok) {
     if (response.status === 401) {
-      if (!isLoginPage) {
-        redirectToLogin();
-      }
-
       throw new Error("Authentication required");
     }
 
@@ -341,6 +330,7 @@ async function apiFetch(path, options = {}) {
 
 function render() {
   renderAuthNav();
+  renderAccessMode();
   renderStats();
   renderTeacherSelects();
   renderTeachers();
@@ -348,6 +338,68 @@ function render() {
   renderStockCardItemPage();
   updateCreateTotalAmount();
   updateAcquiredDetailsUI("");
+}
+
+function renderAccessMode() {
+  toggleReadOnlyNotice(
+    teacherList ? teacherList.parentElement : null,
+    !state.auth.authenticated,
+    "Viewing only. Log in to add, edit, or remove personnel records.",
+  );
+  toggleReadOnlyNotice(
+    inventoryForm ? inventoryForm.parentElement : null,
+    !state.auth.authenticated,
+    "Viewing only. Log in to add or update inventory records.",
+  );
+  toggleReadOnlyNotice(
+    inventoryTableWrap ? inventoryTableWrap.parentElement : null,
+    !state.auth.authenticated,
+    isStockCardPage
+      ? "Viewing only. Log in to edit items or record stock in and stock out."
+      : "Viewing only. Log in to edit or delete inventory records.",
+  );
+
+  if (openTeacherModalBtn) {
+    openTeacherModalBtn.hidden = !state.auth.authenticated;
+  }
+
+  setFormInteractive(inventoryForm, state.auth.authenticated);
+}
+
+function toggleReadOnlyNotice(container, shouldShow, message) {
+  if (!container) {
+    return;
+  }
+
+  let notice = container.querySelector("[data-auth-readonly-note]");
+
+  if (!shouldShow) {
+    if (notice) {
+      notice.remove();
+    }
+    return;
+  }
+
+  if (!notice) {
+    notice = document.createElement("div");
+    notice.className = "auth-readonly-note";
+    notice.dataset.authReadonlyNote = "true";
+    container.insertBefore(notice, container.firstChild);
+  }
+
+  notice.textContent = message;
+}
+
+function setFormInteractive(form, isInteractive) {
+  if (!form) {
+    return;
+  }
+
+  form.classList.toggle("form-readonly", !isInteractive);
+
+  form.querySelectorAll("input, select, textarea, button").forEach((field) => {
+    field.disabled = !isInteractive;
+  });
 }
 
 function renderAuthNav() {
@@ -424,7 +476,12 @@ async function handleLogoutClick() {
     authenticated: false,
     username: "",
   };
-  redirectToLogin();
+  closeAddTeacherModal();
+  closeTeacherModal();
+  closeEditModal();
+  closeStockInModal();
+  closeStockOutModal();
+  render();
 }
 
 function redirectToLogin() {
@@ -518,6 +575,11 @@ function renderTeacherSelects() {
 async function handleTeacherSubmit(event) {
   event.preventDefault();
 
+  if (!state.auth.authenticated) {
+    showAuthRequiredMessage();
+    return;
+  }
+
   const teacher = collectTeacherFormData("");
 
   try {
@@ -553,6 +615,7 @@ function renderTeachers() {
   state.teachers.forEach((teacher) => {
     const card = teacherTemplate.content.cloneNode(true);
     const assignedCount = state.inventory.filter((item) => item.teacherId === teacher.id).length;
+    const actions = card.querySelector(".teacher-actions");
 
     card.querySelector("h3").textContent = getTeacherDisplayName(teacher);
     card.querySelector(".teacher-meta").textContent = [
@@ -568,6 +631,10 @@ function renderTeachers() {
     card.querySelector("[data-action='edit-teacher']").dataset.teacherId = teacher.id;
     card.querySelector("[data-action='delete-teacher']").dataset.teacherId = teacher.id;
 
+    if (!state.auth.authenticated && actions) {
+      actions.innerHTML = `<span class="notes">Login required to make changes.</span>`;
+    }
+
     teacherList.append(card);
   });
 }
@@ -577,11 +644,20 @@ async function handleTeacherListClick(event) {
   const deleteButton = event.target.closest("[data-action='delete-teacher']");
 
   if (editButton) {
+    if (!state.auth.authenticated) {
+      showAuthRequiredMessage();
+      return;
+    }
     openTeacherModal(editButton.dataset.teacherId);
     return;
   }
 
   if (!deleteButton) {
+    return;
+  }
+
+  if (!state.auth.authenticated) {
+    showAuthRequiredMessage();
     return;
   }
 
@@ -596,6 +672,11 @@ async function handleTeacherListClick(event) {
 
 async function handleEditTeacherSubmit(event) {
   event.preventDefault();
+
+  if (!state.auth.authenticated) {
+    showAuthRequiredMessage();
+    return;
+  }
 
   if (!editingTeacherId) {
     closeTeacherModal();
@@ -618,6 +699,11 @@ async function handleEditTeacherSubmit(event) {
 
 async function handleInventorySubmit(event) {
   event.preventDefault();
+
+  if (!state.auth.authenticated) {
+    showAuthRequiredMessage();
+    return;
+  }
 
   const teacherId = itemTeacher ? itemTeacher.value : "";
   const selectedStatus = document.querySelector("#itemStatus").value;
@@ -670,7 +756,7 @@ async function handleInventorySubmit(event) {
     document.querySelector("#itemAcquiredType").value = "Purchase";
     document.querySelector("#itemStatus").value = "Available";
     updateCreateTotalAmount();
-  validateCreateUsabilityBreakdown();
+    validateCreateUsabilityBreakdown();
     updateAcquiredDetailsUI("");
     await refreshData();
   } catch (error) {
@@ -765,13 +851,19 @@ function renderInventory() {
                 <td>
                   <div class="table-actions">
                     ${
-                      isStockCardPage
-                        ? `<button class="primary-btn table-action-btn" type="button" data-action="stock-in-item" data-item-id="${item.id}">Stock In</button>
+                      state.auth.authenticated
+                        ? `
+                          ${
+                            isStockCardPage
+                              ? `<button class="primary-btn table-action-btn" type="button" data-action="stock-in-item" data-item-id="${item.id}">Stock In</button>
                     <button class="primary-btn table-action-btn" type="button" data-action="stock-out-item" data-item-id="${item.id}">Stock Out</button>`
-                        : ""
+                              : ""
+                          }
+                          <button class="primary-btn table-action-btn" type="button" data-action="edit-item" data-item-id="${item.id}">Edit</button>
+                          <button class="ghost-btn table-delete-btn" type="button" data-action="delete-item" data-item-id="${item.id}">Delete</button>
+                        `
+                        : `<span class="notes">Login required to make changes.</span>`
                     }
-                    <button class="primary-btn table-action-btn" type="button" data-action="edit-item" data-item-id="${item.id}">Edit</button>
-                    <button class="ghost-btn table-delete-btn" type="button" data-action="delete-item" data-item-id="${item.id}">Delete</button>
                   </div>
                 </td>
               </tr>
@@ -1184,21 +1276,38 @@ async function handleInventoryTableClick(event) {
   }
 
   if (stockInButton) {
+    if (!state.auth.authenticated) {
+      showAuthRequiredMessage();
+      return;
+    }
     openStockInModal(stockInButton.dataset.itemId);
     return;
   }
 
   if (stockOutButton) {
+    if (!state.auth.authenticated) {
+      showAuthRequiredMessage();
+      return;
+    }
     openStockOutModal(stockOutButton.dataset.itemId);
     return;
   }
 
   if (editButton) {
+    if (!state.auth.authenticated) {
+      showAuthRequiredMessage();
+      return;
+    }
     openEditModal(editButton.dataset.itemId);
     return;
   }
 
   if (!deleteButton) {
+    return;
+  }
+
+  if (!state.auth.authenticated) {
+    showAuthRequiredMessage();
     return;
   }
 
@@ -1223,6 +1332,11 @@ async function handleInventoryTableClick(event) {
 }
 
 function openEditModal(itemId) {
+  if (!state.auth.authenticated) {
+    showAuthRequiredMessage();
+    return;
+  }
+
   if (!editModal || !editInventoryForm || !editItemTeacher) {
     return;
   }
@@ -1266,6 +1380,11 @@ function openEditModal(itemId) {
 
 async function handleEditInventorySubmit(event) {
   event.preventDefault();
+
+  if (!state.auth.authenticated) {
+    showAuthRequiredMessage();
+    return;
+  }
 
   const item = state.inventory.find((entry) => entry.id === editingItemId);
 
@@ -1340,6 +1459,11 @@ function handleModalBackdropClick(event) {
 }
 
 function openStockInModal(itemId) {
+  if (!state.auth.authenticated) {
+    showAuthRequiredMessage();
+    return;
+  }
+
   if (!stockInModal || !stockInForm) {
     return;
   }
@@ -1369,6 +1493,11 @@ function closeStockInModal() {
 }
 
 function openStockOutModal(itemId) {
+  if (!state.auth.authenticated) {
+    showAuthRequiredMessage();
+    return;
+  }
+
   if (!stockOutModal || !stockOutForm) {
     return;
   }
@@ -1404,6 +1533,11 @@ function closeStockOutModal() {
 async function handleStockInSubmit(event) {
   event.preventDefault();
 
+  if (!state.auth.authenticated) {
+    showAuthRequiredMessage();
+    return;
+  }
+
   const item = state.inventory.find((entry) => entry.id === stockMovementItemId);
 
   if (!item) {
@@ -1436,6 +1570,11 @@ async function handleStockInSubmit(event) {
 
 async function handleStockOutSubmit(event) {
   event.preventDefault();
+
+  if (!state.auth.authenticated) {
+    showAuthRequiredMessage();
+    return;
+  }
 
   const item = state.inventory.find((entry) => entry.id === stockMovementItemId);
 
@@ -1722,6 +1861,11 @@ function formatStatusLabel(status) {
 }
 
 function openTeacherModal(teacherId) {
+  if (!state.auth.authenticated) {
+    showAuthRequiredMessage();
+    return;
+  }
+
   if (!editTeacherModal || !editTeacherForm) {
     return;
   }
@@ -1754,6 +1898,11 @@ function openTeacherModal(teacherId) {
 }
 
 function openAddTeacherModal() {
+  if (!state.auth.authenticated) {
+    showAuthRequiredMessage();
+    return;
+  }
+
   if (!addTeacherModal || !teacherForm) {
     return;
   }
@@ -1797,6 +1946,10 @@ function escapeHtml(value) {
 function escapeCsvValue(value) {
   const text = String(value ?? "");
   return `"${text.replaceAll('"', '""')}"`;
+}
+
+function showAuthRequiredMessage() {
+  window.alert("Please log in first to add, edit, or delete records.");
 }
 
 function handleAddTeacherModalBackdropClick(event) {

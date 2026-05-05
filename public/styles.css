@@ -258,6 +258,20 @@ h2 {
   font-weight: 600;
 }
 
+.auth-readonly-note {
+  margin-bottom: 16px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: rgba(212, 134, 47, 0.14);
+  border: 1px solid rgba(212, 134, 47, 0.24);
+  color: #8f5815;
+  font-weight: 600;
+}
+
+.form-readonly {
+  opacity: 0.72;
+}
+
 .panel-wide {
   grid-column: 1 / -1;
 }
