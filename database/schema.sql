@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS teachers (
   first_name TEXT NOT NULL,
   middle_name TEXT DEFAULT '',
   suffix_name TEXT DEFAULT '',
+  school_name TEXT NOT NULL DEFAULT 'Landahan Elementary School',
   department TEXT NOT NULL,
   current_position TEXT NOT NULL,
   email TEXT DEFAULT '',
@@ -28,6 +29,7 @@ CREATE TABLE IF NOT EXISTS inventory_items (
   name TEXT NOT NULL,
   category TEXT NOT NULL,
   description TEXT NOT NULL DEFAULT '',
+  school_name TEXT NOT NULL DEFAULT 'Landahan Elementary School',
   asset_tag TEXT NOT NULL UNIQUE,
   quantity INTEGER NOT NULL CHECK (quantity >= 1),
   quantity_per_property_card INTEGER NOT NULL DEFAULT 0 CHECK (quantity_per_property_card >= 0),
@@ -64,12 +66,23 @@ CREATE TABLE IF NOT EXISTS stock_movements (
   created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS app_users (
+  id TEXT PRIMARY KEY,
+  username TEXT NOT NULL UNIQUE,
+  password_hash TEXT NOT NULL,
+  role TEXT NOT NULL CHECK (role IN ('admin', 'manager')),
+  school_name TEXT DEFAULT '',
+  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE VIEW IF NOT EXISTS inventory_listing AS
 SELECT
   i.id,
   i.name,
   i.category,
   i.description,
+  i.school_name,
   i.asset_tag,
   i.quantity,
   i.quantity_per_property_card,

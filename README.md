@@ -2,27 +2,36 @@
 
 This project is now structured for Vercel deployment:
 
-- static frontend pages are served directly
-- `/api/*` requests go through a Vercel serverless function
-- PostgreSQL is the deployment database
+- Next.js serves the app and API routes
+- the existing frontend screens are served as static assets
+- `/api/*` requests go through a Next.js route handler
+- local development uses SQLite
+- production uses Supabase
 
 ## Environment variables
 
-Set one of these:
+### Local development
 
-- `POSTGRES_URL`
-- `POSTGRES_URL_NON_POOLING`
-- `DATABASE_URL`
+Local development uses the SQLite database at `database/saims.db` by default:
 
-If your provider gives both pooled and direct connection strings, use `POSTGRES_URL_NON_POOLING` for the app.
+```bash
+APP_DATABASE=local
+npm run dev
+```
+
+### Production
+
+Set these in Vercel:
+
+- `APP_DATABASE=supabase`
+- `SUPABASE_URL`
+- `SUPABASE_SERVICE_ROLE_KEY` or `SUPABASE_SECRET_KEY`
 
 ## Deploy on Vercel
 
-1. Add a hosted PostgreSQL database to the Vercel project.
-2. Add the database connection string to the Vercel environment variables.
+1. Create or link the Supabase project.
+2. Add the Supabase environment variables to the Vercel project.
 3. Redeploy the project.
-
-The API will create the needed tables automatically from `database/postgres-schema.sql`.
 
 ## Import the current SQLite data
 
@@ -32,26 +41,8 @@ The API will create the needed tables automatically from `database/postgres-sche
 npm install
 ```
 
-2. Set your Postgres connection string:
+2. Start the app:
 
 ```bash
-export POSTGRES_URL="your-postgres-connection-string"
+npm run dev
 ```
-
-3. Run the migration:
-
-```bash
-npm run migrate:postgres
-```
-
-That imports personnel, inventory items, and stock movement history from `database/landahan.db`.
-
-## Local development
-
-This app can still run locally with the new backend:
-
-```bash
-npm start
-```
-
-Make sure your Postgres connection string is available in the shell first.

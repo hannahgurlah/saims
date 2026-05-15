@@ -1,11 +1,16 @@
 const http = require("node:http");
 const fs = require("node:fs");
 const path = require("node:path");
+const { loadLocalEnv } = require("./lib/env");
+
+loadLocalEnv();
+
 const { ROOT_DIR } = require("./lib/db");
 const { handleApiRequest } = require("./lib/api-router");
 const { sendJson, sendText } = require("./lib/http");
 
 const PORT = process.env.PORT || 3000;
+const HOST = process.env.HOST || "127.0.0.1";
 const STATIC_ROOT_DIR = path.join(ROOT_DIR, "public");
 
 const MIME_TYPES = {
@@ -32,7 +37,7 @@ const server = http.createServer(async (request, response) => {
   }
 });
 
-server.listen(PORT, () => {
+server.listen(PORT, HOST, () => {
   console.log(`School inventory app running at http://localhost:${PORT}`);
 });
 

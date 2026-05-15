@@ -1,4 +1,4 @@
--- Generated from database/landahan.db
+-- Generated from database/saims.db
 BEGIN;
 INSERT INTO teachers (
   id,

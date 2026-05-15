@@ -18,13 +18,13 @@
     <nav class="top-nav">
       <a class="nav-brand" href="index.html">
         <img src="asset/logo.svg" alt="Landahan ES Inventory logo">
-        <span>Landahan ES Inventory</span>
+        <span>SAiMS</span>
       </a>
       <div class="nav-links">
-        <a href="teachers.html">Teaching/Non-Teaching Personnel</a>
+        <a class="active" href="teachers.html">Personnel</a>
         <a href="inventory-item.html">Inventory Item</a>
         <a href="inventory-list.html">Inventory Listing</a>
-        <a class="active" href="stock-card.html">Stock Card</a>
+        <a href="stock-card.html">Stock Card</a>
         <a href="reports.html">Reports</a>
       </div>
     </nav>
@@ -62,6 +62,12 @@
               <span>Teacher</span>
               <select id="filterTeacher">
                 <option value="All">All Personnel</option>
+              </select>
+            </label>
+            <label>
+              <span>School</span>
+              <select id="filterSchool">
+                <option value="All">All Schools</option>
               </select>
             </label>
             <label>
@@ -124,6 +130,10 @@
           <label>
             <span>Description</span>
             <input type="text" id="editItemDescription" required>
+          </label>
+          <label>
+            <span>School Name</span>
+            <input type="text" id="editItemSchoolName" list="schoolNameOptions" autocomplete="off" required>
           </label>
           <label>
             <span>Property Number</span>

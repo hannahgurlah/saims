@@ -2,6 +2,8 @@ const state = {
   auth: {
     authenticated: false,
     username: "",
+    role: "",
+    schoolName: "",
   },
   teachers: [],
   inventory: [],
@@ -12,6 +14,7 @@ const loginForm = document.querySelector("#loginForm");
 const loginError = document.querySelector("#loginError");
 
 const teacherForm = document.querySelector("#teacherForm");
+const teacherSchoolNameInput = document.querySelector("#teacherSchoolName");
 const teacherList = document.querySelector("#teacherList");
 const teacherTemplate = document.querySelector("#teacherCardTemplate");
 const addTeacherModal = document.querySelector("#addTeacherModal");
@@ -19,10 +22,12 @@ const openTeacherModalBtn = document.querySelector("#openTeacherModalBtn");
 const closeAddTeacherModalBtn = document.querySelector("#closeAddTeacherModalBtn");
 const editTeacherModal = document.querySelector("#editTeacherModal");
 const editTeacherForm = document.querySelector("#editTeacherForm");
+const editTeacherSchoolNameInput = document.querySelector("#editTeacherSchoolName");
 const closeTeacherModalBtn = document.querySelector("#closeTeacherModalBtn");
 
 const inventoryForm = document.querySelector("#inventoryForm");
 const itemTeacher = document.querySelector("#itemTeacher");
+const itemSchoolNameInput = document.querySelector("#itemSchoolName");
 const itemQuantityInput = document.querySelector("#itemQuantity");
 const itemQuantityPerPropertyCardInput = document.querySelector("#itemQuantityPerPropertyCard");
 const itemQuantityPerPhysicalCountInput = document.querySelector("#itemQuantityPerPhysicalCount");
@@ -38,6 +43,7 @@ const itemAcquiredDetailsInput = document.querySelector("#itemAcquiredDetails");
 const filterTeacher = document.querySelector("#filterTeacher");
 const filterStatus = document.querySelector("#filterStatus");
 const filterItemType = document.querySelector("#filterItemType");
+const filterSchool = document.querySelector("#filterSchool");
 const searchInput = document.querySelector("#searchInput");
 const inventoryTableWrap = document.querySelector("#inventoryTableWrap");
 const downloadCsvBtn = document.querySelector("#downloadCsvBtn");
@@ -68,6 +74,7 @@ const INVENTORY_PAGE_SIZE = 20;
 const editModal = document.querySelector("#editModal");
 const editInventoryForm = document.querySelector("#editInventoryForm");
 const editItemTeacher = document.querySelector("#editItemTeacher");
+const editItemSchoolNameInput = document.querySelector("#editItemSchoolName");
 const closeModalBtn = document.querySelector("#closeModalBtn");
 const editItemQuantityInput = document.querySelector("#editItemQuantity");
 const editItemQuantityPerPropertyCardInput = document.querySelector("#editItemQuantityPerPropertyCard");
@@ -122,6 +129,11 @@ if (inventoryForm) {
   inventoryForm.addEventListener("submit", handleInventorySubmit);
 }
 
+if (itemSchoolNameInput) {
+  itemSchoolNameInput.addEventListener("input", renderTeacherSelects);
+  itemSchoolNameInput.addEventListener("change", renderTeacherSelects);
+}
+
 if (itemQuantityInput) {
   itemQuantityInput.addEventListener("input", updateCreateTotalAmount);
 }
@@ -156,6 +168,11 @@ if (inventoryTableWrap) {
 
 if (editInventoryForm) {
   editInventoryForm.addEventListener("submit", handleEditInventorySubmit);
+}
+
+if (editItemSchoolNameInput) {
+  editItemSchoolNameInput.addEventListener("input", renderTeacherSelects);
+  editItemSchoolNameInput.addEventListener("change", renderTeacherSelects);
 }
 
 if (editItemQuantityInput) {
@@ -230,6 +247,10 @@ if (filterItemType) {
   filterItemType.addEventListener("change", handleInventoryFilterChange);
 }
 
+if (filterSchool) {
+  filterSchool.addEventListener("change", handleSchoolFilterChange);
+}
+
 if (searchInput) {
   searchInput.addEventListener("input", handleInventoryFilterChange);
 }
@@ -275,7 +296,7 @@ async function initializeApp() {
     await refreshData();
   } catch (error) {
     console.error(error);
-    renderErrorState(state.auth.authenticated ? "Unable to load data from the database." : "Please log in to continue.");
+    renderErrorState("Unable to load data from the database.");
   }
 }
 
@@ -284,6 +305,8 @@ async function refreshSession() {
   state.auth = {
     authenticated: Boolean(session && session.authenticated),
     username: session && session.username ? session.username : "",
+    role: session && session.role ? session.role : "",
+    schoolName: session && session.schoolName ? session.schoolName : "",
   };
 }
 
@@ -332,7 +355,9 @@ function render() {
   renderAuthNav();
   renderAccessMode();
   renderStats();
+  renderSchoolAutocomplete();
   renderTeacherSelects();
+  renderSchoolFilter();
   renderTeachers();
   renderInventory();
   renderStockCardItemPage();
@@ -407,10 +432,19 @@ function renderAuthNav() {
     return;
   }
 
-  const existingSlot = navLinks.querySelector(".nav-auth-slot");
+  const topNav = document.querySelector(".top-nav");
+  const existingSlot = document.querySelector(".nav-auth-slot");
 
   if (existingSlot) {
     existingSlot.remove();
+  }
+
+  if (!topNav || !topNav.parentElement) {
+    return;
+  }
+
+  if (isLoginPage && !state.auth.authenticated) {
+    return;
   }
 
   const slot = document.createElement("div");
@@ -419,7 +453,9 @@ function renderAuthNav() {
   if (state.auth.authenticated) {
     const userLabel = document.createElement("span");
     userLabel.className = "nav-user-label";
-    userLabel.textContent = state.auth.username;
+    userLabel.textContent = state.auth.schoolName
+      ? `${state.auth.username} (${state.auth.schoolName})`
+      : state.auth.username;
 
     const logoutButton = document.createElement("button");
     logoutButton.className = "ghost-btn nav-logout-btn";
@@ -440,7 +476,7 @@ function renderAuthNav() {
     slot.append(loginLink);
   }
 
-  navLinks.append(slot);
+  topNav.parentElement.insertBefore(slot, topNav);
 }
 
 async function handleLoginSubmit(event) {
@@ -475,6 +511,8 @@ async function handleLogoutClick() {
   state.auth = {
     authenticated: false,
     username: "",
+    role: "",
+    schoolName: "",
   };
   closeAddTeacherModal();
   closeTeacherModal();
@@ -531,31 +569,35 @@ function renderStats() {
 }
 
 function renderTeacherSelects() {
-  const teacherOptions = state.teachers
+  const allTeacherOptions = state.teachers
     .map((teacher) => `<option value="${teacher.id}">${escapeHtml(getTeacherDisplayName(teacher))}</option>`)
     .join("");
 
   if (itemTeacher) {
     const selectedTeacher = itemTeacher.value;
+    const schoolName = itemSchoolNameInput ? itemSchoolNameInput.value.trim() : "";
+    const teacherOptions = buildTeacherOptionsForSchool(schoolName);
     itemTeacher.innerHTML = `<option value="">Unassigned</option>${teacherOptions}`;
 
-    if (selectedTeacher && state.teachers.some((teacher) => teacher.id === selectedTeacher)) {
+    if (selectedTeacher && state.teachers.some((teacher) => teacher.id === selectedTeacher && (!schoolName || teacher.schoolName === schoolName))) {
       itemTeacher.value = selectedTeacher;
     }
   }
 
   if (editItemTeacher) {
     const selectedEditTeacher = editItemTeacher.value;
+    const schoolName = editItemSchoolNameInput ? editItemSchoolNameInput.value.trim() : "";
+    const teacherOptions = buildTeacherOptionsForSchool(schoolName);
     editItemTeacher.innerHTML = `<option value="">Unassigned</option>${teacherOptions}`;
 
-    if (selectedEditTeacher === "" || state.teachers.some((teacher) => teacher.id === selectedEditTeacher)) {
+    if (selectedEditTeacher === "" || state.teachers.some((teacher) => teacher.id === selectedEditTeacher && (!schoolName || teacher.schoolName === schoolName))) {
       editItemTeacher.value = selectedEditTeacher;
     }
   }
 
   if (filterTeacher) {
     const selectedFilter = filterTeacher.value;
-    filterTeacher.innerHTML = `<option value="All">All Personnel</option>${teacherOptions}`;
+    filterTeacher.innerHTML = `<option value="All">All Personnel</option>${allTeacherOptions}`;
 
     if (selectedFilter === "All" || state.teachers.some((teacher) => teacher.id === selectedFilter)) {
       filterTeacher.value = selectedFilter;
@@ -564,11 +606,92 @@ function renderTeacherSelects() {
 
   if (stockOutTeacher) {
     const selectedStockOutTeacher = stockOutTeacher.value;
-    stockOutTeacher.innerHTML = `<option value="">Select personnel</option>${teacherOptions}`;
+    stockOutTeacher.innerHTML = `<option value="">Select personnel</option>${allTeacherOptions}`;
 
     if (selectedStockOutTeacher && state.teachers.some((teacher) => teacher.id === selectedStockOutTeacher)) {
       stockOutTeacher.value = selectedStockOutTeacher;
     }
+  }
+}
+
+function buildTeacherOptionsForSchool(schoolName) {
+  return state.teachers
+    .filter((teacher) => !schoolName || teacher.schoolName === schoolName)
+    .map((teacher) => `<option value="${teacher.id}">${escapeHtml(getTeacherDisplayName(teacher))}</option>`)
+    .join("");
+}
+
+function getSchoolNames() {
+  if (state.auth.role === "manager" && state.auth.schoolName) {
+    return [state.auth.schoolName];
+  }
+
+  return [...new Set([
+    "Landahan Elementary School",
+    ...state.teachers.map((teacher) => teacher.schoolName),
+    ...state.inventory.map((item) => item.schoolName),
+  ].filter(Boolean))].sort((a, b) => a.localeCompare(b));
+}
+
+function renderSchoolAutocomplete() {
+  const schoolInputs = [
+    teacherSchoolNameInput,
+    editTeacherSchoolNameInput,
+    itemSchoolNameInput,
+    editItemSchoolNameInput,
+  ].filter(Boolean);
+
+  if (!schoolInputs.length) {
+    return;
+  }
+
+  const schoolNames = getSchoolNames();
+  let dataList = document.querySelector("#schoolNameOptions");
+
+  if (!dataList) {
+    dataList = document.createElement("datalist");
+    dataList.id = "schoolNameOptions";
+    document.body.append(dataList);
+  }
+
+  dataList.innerHTML = schoolNames
+    .map((schoolName) => `<option value="${escapeHtml(schoolName)}"></option>`)
+    .join("");
+
+  schoolInputs.forEach((input) => {
+    const selectedSchool = state.auth.role === "manager" && state.auth.schoolName
+      ? state.auth.schoolName
+      : input.value || "Landahan Elementary School";
+
+    input.setAttribute("list", "schoolNameOptions");
+    input.value = selectedSchool;
+    input.readOnly = state.auth.role === "manager" && Boolean(state.auth.schoolName);
+  });
+}
+
+function renderSchoolFilter() {
+  if (!filterSchool) {
+    return;
+  }
+
+  const selectedSchool = filterSchool.value;
+  const schoolNames = getSchoolNames();
+  const schoolOptions = schoolNames
+    .map((schoolName) => `<option value="${escapeHtml(schoolName)}">${escapeHtml(schoolName)}</option>`)
+    .join("");
+
+  filterSchool.innerHTML = `<option value="All">All Schools</option>${schoolOptions}`;
+
+  if (state.auth.role === "manager" && state.auth.schoolName) {
+    filterSchool.value = state.auth.schoolName;
+    filterSchool.disabled = true;
+    return;
+  }
+
+  filterSchool.disabled = false;
+
+  if (selectedSchool === "All" || schoolNames.includes(selectedSchool)) {
+    filterSchool.value = selectedSchool;
   }
 }
 
@@ -607,12 +730,14 @@ function renderTeachers() {
 
   teacherList.innerHTML = "";
 
-  if (!state.teachers.length) {
+  const filteredTeachers = getFilteredTeachers();
+
+  if (!filteredTeachers.length) {
     teacherList.innerHTML = `<div class="empty-state">No personnel yet. Add one to start tagging inventory items.</div>`;
     return;
   }
 
-  state.teachers.forEach((teacher) => {
+  filteredTeachers.forEach((teacher) => {
     const card = teacherTemplate.content.cloneNode(true);
     const assignedCount = state.inventory.filter((item) => item.teacherId === teacher.id).length;
     const actions = card.querySelector(".teacher-actions");
@@ -621,6 +746,7 @@ function renderTeachers() {
     card.querySelector(".teacher-meta").textContent = [
       teacher.department,
       teacher.currentPosition || "",
+      teacher.schoolName || "",
       teacher.gender || "",
       teacher.civilStatus || "",
       teacher.email || "No email provided",
@@ -712,6 +838,7 @@ async function handleInventorySubmit(event) {
     name: document.querySelector("#itemName").value.trim(),
     category: document.querySelector("#itemCategory").value.trim(),
     description: document.querySelector("#itemDescription").value.trim(),
+    schoolName: document.querySelector("#itemSchoolName").value.trim(),
     assetTag: document.querySelector("#itemTag").value.trim(),
     quantity: Number(document.querySelector("#itemQuantity").value),
     quantityPerPropertyCard: Number(document.querySelector("#itemQuantityPerPropertyCard").value),
@@ -752,6 +879,7 @@ async function handleInventorySubmit(event) {
     document.querySelector("#itemUsableCount").value = 0;
     document.querySelector("#itemNonUsableCount").value = 0;
     document.querySelector("#itemUnit").value = "";
+    document.querySelector("#itemSchoolName").value = "Landahan Elementary School";
     document.querySelector("#itemAssetType").value = "PPE";
     document.querySelector("#itemAcquiredType").value = "Purchase";
     document.querySelector("#itemStatus").value = "Available";
@@ -833,7 +961,8 @@ function renderInventory() {
                   ${
                     isStockCardPage
                       ? `<span class="notes">${formatCurrency(item.amount)}</span>`
-                      : `<span class="notes">Type of Item: ${escapeHtml(formatItemTypeLabel(item.assetType || "-"))}</span><br>
+                      : `<span class="notes">School: ${escapeHtml(item.schoolName || "-")}</span><br>
+                  <span class="notes">Type of Item: ${escapeHtml(formatItemTypeLabel(item.assetType || "-"))}</span><br>
                   <span class="notes">Acquired: ${escapeHtml(item.acquiredType || "-")}</span><br>
                   <span class="notes">Acquired Details: ${escapeHtml(item.acquiredDetails || "-")}</span><br>
                   <span class="notes">${formatCurrency(item.amount)}</span><br>
@@ -888,6 +1017,7 @@ function getFilteredInventoryItems() {
   const teacherFilterValue = filterTeacher ? filterTeacher.value : "All";
   const statusFilterValue = filterStatus ? filterStatus.value : "All";
   const itemTypeFilterValue = filterItemType ? filterItemType.value : "All";
+  const schoolFilterValue = filterSchool ? filterSchool.value : "All";
   const searchValue = searchInput ? searchInput.value.trim().toLowerCase() : "";
 
   return state.inventory.filter((item) => {
@@ -896,6 +1026,7 @@ function getFilteredInventoryItems() {
     const teacherMatch = teacherFilterValue === "All" || item.teacherId === teacherFilterValue;
     const statusMatch = statusFilterValue === "All" || item.status === statusFilterValue;
     const itemTypeMatch = itemTypeFilterValue === "All" || item.assetType === itemTypeFilterValue;
+    const schoolMatch = schoolFilterValue === "All" || item.schoolName === schoolFilterValue;
     const searchMatch =
       !searchValue ||
       [
@@ -904,6 +1035,7 @@ function getFilteredInventoryItems() {
         item.description,
         item.assetTag,
         item.location,
+        item.schoolName,
         item.notes,
         item.unitOfMeasurement,
         item.uacsCode,
@@ -917,7 +1049,7 @@ function getFilteredInventoryItems() {
         .toLowerCase()
         .includes(searchValue);
 
-    return stockCardMatch && inventoryItemMatch && teacherMatch && statusMatch && itemTypeMatch && searchMatch;
+    return stockCardMatch && inventoryItemMatch && teacherMatch && statusMatch && itemTypeMatch && schoolMatch && searchMatch;
   });
 }
 
@@ -938,6 +1070,7 @@ function downloadInventoryCsv() {
       "Item Name",
       "Category",
       "Description",
+      "School Name",
       "Property Number",
       "Quantity",
       "Quantity per Property Card",
@@ -968,6 +1101,7 @@ function downloadInventoryCsv() {
         item.name,
         item.category,
         item.description || "",
+        item.schoolName || "",
         item.assetTag,
         item.quantity,
         item.quantityPerPropertyCard ?? 0,
@@ -1018,6 +1152,7 @@ function downloadTeachersCsv() {
       "First Name",
       "Middle Name",
       "Suffix Name",
+      "School Name",
       "Department",
       "Current Position",
       "Email",
@@ -1037,6 +1172,7 @@ function downloadTeachersCsv() {
       teacher.firstName || "",
       teacher.middleName || "",
       teacher.suffixName || "",
+      teacher.schoolName || "",
       teacher.department || "",
       teacher.currentPosition || "",
       teacher.email || "",
@@ -1073,6 +1209,7 @@ function downloadStockCardCsv() {
       "Item Name",
       "Category",
       "Description",
+      "School Name",
       "Property Number",
       "Unit of Measurement",
       "Remaining Quantity",
@@ -1084,6 +1221,7 @@ function downloadStockCardCsv() {
       item.name,
       item.category,
       item.description || "",
+      item.schoolName || "",
       item.assetTag,
       item.unitOfMeasurement || "",
       item.quantity,
@@ -1109,6 +1247,7 @@ function downloadPpeReportCsv() {
       "Item Name",
       "Category",
       "Description",
+      "School Name",
       "Property Number",
       "Quantity",
       "Quantity per Property Card",
@@ -1138,6 +1277,7 @@ function downloadPpeReportCsv() {
         item.name,
         item.category,
         item.description || "",
+        item.schoolName || "",
         item.assetTag,
         item.quantity,
         item.quantityPerPropertyCard ?? 0,
@@ -1179,6 +1319,7 @@ function downloadSemiExpendableReportCsv() {
       "Item Name",
       "Category",
       "Description",
+      "School Name",
       "Property Number",
       "Quantity",
       "Quantity per Property Card",
@@ -1208,6 +1349,7 @@ function downloadSemiExpendableReportCsv() {
         item.name,
         item.category,
         item.description || "",
+        item.schoolName || "",
         item.assetTag,
         item.quantity,
         item.quantityPerPropertyCard ?? 0,
@@ -1252,6 +1394,18 @@ function downloadCsvFile(rows, filename) {
 function handleInventoryFilterChange() {
   currentInventoryPage = 1;
   renderInventory();
+}
+
+function handleSchoolFilterChange() {
+  currentInventoryPage = 1;
+  renderTeachers();
+  renderInventory();
+}
+
+function getFilteredTeachers() {
+  const schoolFilterValue = filterSchool ? filterSchool.value : "All";
+
+  return state.teachers.filter((teacher) => schoolFilterValue === "All" || teacher.schoolName === schoolFilterValue);
 }
 
 async function handleInventoryTableClick(event) {
@@ -1351,6 +1505,8 @@ function openEditModal(itemId) {
   document.querySelector("#editItemName").value = item.name;
   document.querySelector("#editItemCategory").value = item.category;
   document.querySelector("#editItemDescription").value = item.description || "";
+  document.querySelector("#editItemSchoolName").value = item.schoolName || "Landahan Elementary School";
+  renderTeacherSelects();
   document.querySelector("#editItemTag").value = item.assetTag;
   document.querySelector("#editItemQuantity").value = item.quantity;
   document.querySelector("#editItemQuantityPerPropertyCard").value = item.quantityPerPropertyCard ?? 0;
@@ -1398,6 +1554,7 @@ async function handleEditInventorySubmit(event) {
     name: document.querySelector("#editItemName").value.trim(),
     category: document.querySelector("#editItemCategory").value.trim(),
     description: document.querySelector("#editItemDescription").value.trim(),
+    schoolName: document.querySelector("#editItemSchoolName").value.trim(),
     assetTag: document.querySelector("#editItemTag").value.trim(),
     quantity: Math.max(1, Number(document.querySelector("#editItemQuantity").value) || 1),
     quantityPerPropertyCard: Math.max(0, Number(document.querySelector("#editItemQuantityPerPropertyCard").value) || 0),
@@ -1653,6 +1810,7 @@ function collectTeacherFormData(prefix) {
     firstName: get("FirstName").value.trim(),
     middleName: get("MiddleName").value.trim(),
     suffixName: get("SuffixName").value.trim(),
+    schoolName: get("SchoolName").value.trim(),
     department: get("Department").value.trim(),
     currentPosition: get("CurrentPosition").value,
     email: get("Email").value.trim(),
@@ -1881,6 +2039,7 @@ function openTeacherModal(teacherId) {
   document.querySelector("#editTeacherFirstName").value = teacher.firstName || "";
   document.querySelector("#editTeacherMiddleName").value = teacher.middleName || "";
   document.querySelector("#editTeacherSuffixName").value = teacher.suffixName || "";
+  document.querySelector("#editTeacherSchoolName").value = teacher.schoolName || "Landahan Elementary School";
   document.querySelector("#editTeacherDepartment").value = teacher.department || "";
   document.querySelector("#editTeacherCurrentPosition").value = teacher.currentPosition || "Principal I";
   document.querySelector("#editTeacherEmail").value = teacher.email || "";
@@ -1908,6 +2067,7 @@ function openAddTeacherModal() {
   }
 
   teacherForm.reset();
+  document.querySelector("#teacherSchoolName").value = "Landahan Elementary School";
   document.querySelector("#teacherCurrentPosition").value = "Principal I";
   document.querySelector("#teacherCivilStatus").value = "Single";
   document.querySelector("#teacherGender").value = "Female";
@@ -1920,6 +2080,7 @@ function closeAddTeacherModal() {
   }
 
   teacherForm.reset();
+  document.querySelector("#teacherSchoolName").value = "Landahan Elementary School";
   document.querySelector("#teacherCurrentPosition").value = "Principal I";
   document.querySelector("#teacherCivilStatus").value = "Single";
   document.querySelector("#teacherGender").value = "Female";

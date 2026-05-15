@@ -4,7 +4,7 @@ const { DatabaseSync } = require("node:sqlite");
 const { Pool } = require("pg");
 
 const ROOT_DIR = path.join(__dirname, "..");
-const SQLITE_DB_PATH = path.join(ROOT_DIR, "database", "landahan.db");
+const SQLITE_DB_PATH = path.join(ROOT_DIR, "database", "saims.db");
 const POSTGRES_SCHEMA_PATH = path.join(ROOT_DIR, "database", "postgres-schema.sql");
 
 function getConnectionString() {

@@ -1,4 +1,7 @@
 node_modules
 .vercel
+.next
+.npm-cache
+.DS_Store
 npm-debug.log*
 .env*.local

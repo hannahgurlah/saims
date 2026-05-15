@@ -89,10 +89,25 @@ body {
 }
 
 .nav-auth-slot {
-  display: inline-flex;
+  display: flex;
+  justify-content: flex-end;
   align-items: center;
   gap: 10px;
-  margin-left: 8px;
+  margin-bottom: 10px;
+  margin-left: auto;
+}
+
+.nav-auth-slot a {
+  color: var(--muted);
+  padding: 8px 12px;
+  border-radius: 999px;
+  text-decoration: none;
+}
+
+.nav-auth-slot a.active,
+.nav-auth-slot a:hover {
+  color: white;
+  background: var(--accent);
 }
 
 .nav-user-label {
@@ -586,6 +601,15 @@ tbody tr:hover {
 }
 
 @media (max-width: 920px) {
+  .nav-auth-slot {
+    justify-content: flex-end;
+  }
+
+  .nav-auth-slot a,
+  .nav-auth-slot button {
+    text-align: center;
+  }
+
   .top-nav {
     flex-direction: column;
     align-items: stretch;

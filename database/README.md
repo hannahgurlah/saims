@@ -5,13 +5,13 @@ This folder now contains both the legacy SQLite files and the new PostgreSQL sch
 Files:
 - `schema.sql`: Legacy SQLite schema
 - `seed.sql`: Legacy SQLite seed data
-- `landahan.db`: Local SQLite snapshot and migration source
+- `saims.db`: Local SQLite snapshot and migration source
 - `postgres-schema.sql`: PostgreSQL schema used by the Vercel-ready API
 
 Useful commands:
 
 ```bash
-sqlite3 database/landahan.db "SELECT * FROM inventory_listing;"
+sqlite3 database/saims.db "SELECT * FROM inventory_listing;"
 npm run migrate:postgres
 ```
 

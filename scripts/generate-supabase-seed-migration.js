@@ -3,7 +3,7 @@ const path = require("node:path");
 const { DatabaseSync } = require("node:sqlite");
 
 const ROOT_DIR = path.join(__dirname, "..");
-const SQLITE_DB_PATH = path.join(ROOT_DIR, "database", "landahan.db");
+const SQLITE_DB_PATH = path.join(ROOT_DIR, "database", "saims.db");
 const MIGRATIONS_DIR = path.join(ROOT_DIR, "supabase", "migrations");
 const OUTPUT_PATH = path.join(MIGRATIONS_DIR, "20260420221000_seed_landahan_data.sql");
 
@@ -117,7 +117,7 @@ function main() {
   ];
 
   const sql = [
-    "-- Generated from database/landahan.db",
+    "-- Generated from database/saims.db",
     "BEGIN;",
     buildInsert("teachers", teacherColumns, teachers, ["id"]),
     buildInsert("inventory_items", inventoryColumns, inventoryItems, ["id"]),
