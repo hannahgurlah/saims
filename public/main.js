@@ -45,6 +45,7 @@ const filterStatus = document.querySelector("#filterStatus");
 const filterItemType = document.querySelector("#filterItemType");
 const filterSchool = document.querySelector("#filterSchool");
 const searchInput = document.querySelector("#searchInput");
+const teacherSearchInput = document.querySelector("#teacherSearchInput");
 const inventoryTableWrap = document.querySelector("#inventoryTableWrap");
 const downloadCsvBtn = document.querySelector("#downloadCsvBtn");
 const downloadTeachersCsvBtn = document.querySelector("#downloadTeachersCsvBtn");
@@ -62,6 +63,7 @@ const isStockCardPage = window.location.pathname.endsWith("/stock-card.html") ||
 const isInventoryItemPage = window.location.pathname.endsWith("/inventory-item.html") || window.location.pathname.endsWith("inventory-item.html");
 const isInventoryListPage = window.location.pathname.endsWith("/inventory-list.html") || window.location.pathname.endsWith("inventory-list.html");
 const isStockCardItemPage = window.location.pathname.endsWith("/stock-card-item.html") || window.location.pathname.endsWith("stock-card-item.html");
+setActiveNavigationLink();
 const stockInModal = document.querySelector("#stockInModal");
 const stockOutModal = document.querySelector("#stockOutModal");
 const stockInForm = document.querySelector("#stockInForm");
@@ -69,7 +71,7 @@ const stockOutForm = document.querySelector("#stockOutForm");
 const stockOutTeacher = document.querySelector("#stockOutTeacher");
 const closeStockInModalBtn = document.querySelector("#closeStockInModalBtn");
 const closeStockOutModalBtn = document.querySelector("#closeStockOutModalBtn");
-const INVENTORY_PAGE_SIZE = 20;
+const LISTING_PAGE_SIZE = 15;
 
 const editModal = document.querySelector("#editModal");
 const editInventoryForm = document.querySelector("#editInventoryForm");
@@ -92,6 +94,24 @@ let editingTeacherId = "";
 let stockMovementItemId = "";
 let stockCardMovements = [];
 let currentInventoryPage = 1;
+let currentTeacherPage = 1;
+
+function setActiveNavigationLink() {
+  if (!navLinks) {
+    return;
+  }
+
+  const currentPage = window.location.pathname.split("/").pop() || "index.html";
+  const stockCardPages = new Set(["stock-card.html", "stock-card-item.html"]);
+
+  navLinks.querySelectorAll("a").forEach((link) => {
+    const linkedPage = link.getAttribute("href") || "";
+    const isActive = linkedPage === currentPage || (stockCardPages.has(currentPage) && linkedPage === "stock-card.html");
+    link.classList.toggle("active", isActive);
+    link.setAttribute("aria-label", link.textContent.trim());
+    link.setAttribute("title", link.textContent.trim());
+  });
+}
 
 if (teacherForm) {
   teacherForm.addEventListener("submit", handleTeacherSubmit);
@@ -255,6 +275,10 @@ if (searchInput) {
   searchInput.addEventListener("input", handleInventoryFilterChange);
 }
 
+if (teacherSearchInput) {
+  teacherSearchInput.addEventListener("input", handleTeacherFilterChange);
+}
+
 if (downloadCsvBtn) {
   downloadCsvBtn.addEventListener("click", downloadInventoryCsv);
 }
@@ -284,7 +308,6 @@ initializeApp();
 async function initializeApp() {
   try {
     await refreshSession();
-    renderAuthNav();
 
     if (isLoginPage) {
       if (state.auth.authenticated) {
@@ -293,6 +316,12 @@ async function initializeApp() {
       return;
     }
 
+    if (!state.auth.authenticated) {
+      redirectToLogin();
+      return;
+    }
+
+    renderAuthNav();
     await refreshData();
   } catch (error) {
     console.error(error);
@@ -476,7 +505,7 @@ function renderAuthNav() {
     slot.append(loginLink);
   }
 
-  topNav.parentElement.insertBefore(slot, topNav);
+  topNav.append(slot);
 }
 
 async function handleLoginSubmit(event) {
@@ -514,12 +543,7 @@ async function handleLogoutClick() {
     role: "",
     schoolName: "",
   };
-  closeAddTeacherModal();
-  closeTeacherModal();
-  closeEditModal();
-  closeStockInModal();
-  closeStockOutModal();
-  render();
+  redirectToLogin();
 }
 
 function redirectToLogin() {
@@ -731,13 +755,17 @@ function renderTeachers() {
   teacherList.innerHTML = "";
 
   const filteredTeachers = getFilteredTeachers();
+  const totalPages = Math.max(1, Math.ceil(filteredTeachers.length / LISTING_PAGE_SIZE));
+  currentTeacherPage = Math.min(currentTeacherPage, totalPages);
 
   if (!filteredTeachers.length) {
     teacherList.innerHTML = `<div class="empty-state">No personnel yet. Add one to start tagging inventory items.</div>`;
     return;
   }
 
-  filteredTeachers.forEach((teacher) => {
+  const paginatedTeachers = filteredTeachers.slice((currentTeacherPage - 1) * LISTING_PAGE_SIZE, currentTeacherPage * LISTING_PAGE_SIZE);
+
+  paginatedTeachers.forEach((teacher) => {
     const card = teacherTemplate.content.cloneNode(true);
     const assignedCount = state.inventory.filter((item) => item.teacherId === teacher.id).length;
     const actions = card.querySelector(".teacher-actions");
@@ -763,11 +791,35 @@ function renderTeachers() {
 
     teacherList.append(card);
   });
+
+  teacherList.insertAdjacentHTML(
+    "beforeend",
+    `<div class="pagination-bar">
+      <button class="ghost-btn pagination-btn" type="button" data-action="teacher-page-prev" ${currentTeacherPage === 1 ? "disabled" : ""}>Previous</button>
+      <span class="notes">Page ${currentTeacherPage} of ${totalPages}</span>
+      <button class="ghost-btn pagination-btn" type="button" data-action="teacher-page-next" ${currentTeacherPage === totalPages ? "disabled" : ""}>Next</button>
+    </div>`,
+  );
 }
 
 async function handleTeacherListClick(event) {
+  const prevPageButton = event.target.closest("[data-action='teacher-page-prev']");
+  const nextPageButton = event.target.closest("[data-action='teacher-page-next']");
   const editButton = event.target.closest("[data-action='edit-teacher']");
   const deleteButton = event.target.closest("[data-action='delete-teacher']");
+
+  if (prevPageButton) {
+    currentTeacherPage = Math.max(1, currentTeacherPage - 1);
+    renderTeachers();
+    return;
+  }
+
+  if (nextPageButton) {
+    const totalPages = Math.max(1, Math.ceil(getFilteredTeachers().length / LISTING_PAGE_SIZE));
+    currentTeacherPage = Math.min(totalPages, currentTeacherPage + 1);
+    renderTeachers();
+    return;
+  }
 
   if (editButton) {
     if (!state.auth.authenticated) {
@@ -838,6 +890,10 @@ async function handleInventorySubmit(event) {
     name: document.querySelector("#itemName").value.trim(),
     category: document.querySelector("#itemCategory").value.trim(),
     description: document.querySelector("#itemDescription").value.trim(),
+    dateReceived: document.querySelector("#itemDateReceived").value,
+    brandName: document.querySelector("#itemBrandName").value.trim(),
+    bookTitle: document.querySelector("#itemBookTitle").value.trim(),
+    bookPublisher: document.querySelector("#itemBookPublisher").value.trim(),
     schoolName: document.querySelector("#itemSchoolName").value.trim(),
     assetTag: document.querySelector("#itemTag").value.trim(),
     quantity: Number(document.querySelector("#itemQuantity").value),
@@ -899,7 +955,8 @@ function renderInventory() {
   }
 
   const filteredItems = getFilteredInventoryItems();
-  const totalPages = isInventoryListPage ? Math.max(1, Math.ceil(filteredItems.length / INVENTORY_PAGE_SIZE)) : 1;
+  const shouldPaginateInventory = isInventoryListPage || isStockCardPage;
+  const totalPages = shouldPaginateInventory ? Math.max(1, Math.ceil(filteredItems.length / LISTING_PAGE_SIZE)) : 1;
 
   if (isInventoryListPage) {
     currentInventoryPage = Math.min(currentInventoryPage, totalPages);
@@ -918,8 +975,8 @@ function renderInventory() {
     return;
   }
 
-  const paginatedItems = isInventoryListPage
-    ? filteredItems.slice((currentInventoryPage - 1) * INVENTORY_PAGE_SIZE, currentInventoryPage * INVENTORY_PAGE_SIZE)
+  const paginatedItems = shouldPaginateInventory
+    ? filteredItems.slice((currentInventoryPage - 1) * LISTING_PAGE_SIZE, currentInventoryPage * LISTING_PAGE_SIZE)
     : filteredItems;
 
   inventoryTableWrap.innerHTML = `
@@ -962,6 +1019,10 @@ function renderInventory() {
                     isStockCardPage
                       ? `<span class="notes">${formatCurrency(item.amount)}</span>`
                       : `<span class="notes">School: ${escapeHtml(item.schoolName || "-")}</span><br>
+                  <span class="notes">Date Received: ${escapeHtml(item.dateReceived || "-")}</span><br>
+                  <span class="notes">Brand Name: ${escapeHtml(item.brandName || "-")}</span><br>
+                  <span class="notes">Book Title: ${escapeHtml(item.bookTitle || "-")}</span><br>
+                  <span class="notes">Book Publisher: ${escapeHtml(item.bookPublisher || "-")}</span><br>
                   <span class="notes">Type of Item: ${escapeHtml(formatItemTypeLabel(item.assetType || "-"))}</span><br>
                   <span class="notes">Acquired: ${escapeHtml(item.acquiredType || "-")}</span><br>
                   <span class="notes">Acquired Details: ${escapeHtml(item.acquiredDetails || "-")}</span><br>
@@ -1002,7 +1063,7 @@ function renderInventory() {
       </tbody>
     </table>
     ${
-      isInventoryListPage
+      shouldPaginateInventory
         ? `<div class="pagination-bar">
       <button class="ghost-btn pagination-btn" type="button" data-action="inventory-page-prev" ${currentInventoryPage === 1 ? "disabled" : ""}>Previous</button>
       <span class="notes">Page ${currentInventoryPage} of ${totalPages}</span>
@@ -1033,6 +1094,10 @@ function getFilteredInventoryItems() {
         item.name,
         item.category,
         item.description,
+        item.dateReceived,
+        item.brandName,
+        item.bookTitle,
+        item.bookPublisher,
         item.assetTag,
         item.location,
         item.schoolName,
@@ -1070,6 +1135,10 @@ function downloadInventoryCsv() {
       "Item Name",
       "Category",
       "Description",
+      "Date Received",
+      "Brand Name",
+      "Book Title",
+      "Book Publisher",
       "School Name",
       "Property Number",
       "Quantity",
@@ -1101,6 +1170,10 @@ function downloadInventoryCsv() {
         item.name,
         item.category,
         item.description || "",
+        item.dateReceived || "",
+        item.brandName || "",
+        item.bookTitle || "",
+        item.bookPublisher || "",
         item.schoolName || "",
         item.assetTag,
         item.quantity,
@@ -1209,6 +1282,10 @@ function downloadStockCardCsv() {
       "Item Name",
       "Category",
       "Description",
+      "Date Received",
+      "Brand Name",
+      "Book Title",
+      "Book Publisher",
       "School Name",
       "Property Number",
       "Unit of Measurement",
@@ -1221,6 +1298,10 @@ function downloadStockCardCsv() {
       item.name,
       item.category,
       item.description || "",
+      item.dateReceived || "",
+      item.brandName || "",
+      item.bookTitle || "",
+      item.bookPublisher || "",
       item.schoolName || "",
       item.assetTag,
       item.unitOfMeasurement || "",
@@ -1247,6 +1328,10 @@ function downloadPpeReportCsv() {
       "Item Name",
       "Category",
       "Description",
+      "Date Received",
+      "Brand Name",
+      "Book Title",
+      "Book Publisher",
       "School Name",
       "Property Number",
       "Quantity",
@@ -1277,6 +1362,10 @@ function downloadPpeReportCsv() {
         item.name,
         item.category,
         item.description || "",
+        item.dateReceived || "",
+        item.brandName || "",
+        item.bookTitle || "",
+        item.bookPublisher || "",
         item.schoolName || "",
         item.assetTag,
         item.quantity,
@@ -1319,6 +1408,10 @@ function downloadSemiExpendableReportCsv() {
       "Item Name",
       "Category",
       "Description",
+      "Date Received",
+      "Brand Name",
+      "Book Title",
+      "Book Publisher",
       "School Name",
       "Property Number",
       "Quantity",
@@ -1349,6 +1442,10 @@ function downloadSemiExpendableReportCsv() {
         item.name,
         item.category,
         item.description || "",
+        item.dateReceived || "",
+        item.brandName || "",
+        item.bookTitle || "",
+        item.bookPublisher || "",
         item.schoolName || "",
         item.assetTag,
         item.quantity,
@@ -1396,16 +1493,44 @@ function handleInventoryFilterChange() {
   renderInventory();
 }
 
+function handleTeacherFilterChange() {
+  currentTeacherPage = 1;
+  renderTeachers();
+}
+
 function handleSchoolFilterChange() {
   currentInventoryPage = 1;
+  currentTeacherPage = 1;
   renderTeachers();
   renderInventory();
 }
 
 function getFilteredTeachers() {
   const schoolFilterValue = filterSchool ? filterSchool.value : "All";
+  const searchValue = teacherSearchInput ? teacherSearchInput.value.trim().toLowerCase() : "";
 
-  return state.teachers.filter((teacher) => schoolFilterValue === "All" || teacher.schoolName === schoolFilterValue);
+  return state.teachers.filter((teacher) => {
+    const schoolMatch = schoolFilterValue === "All" || teacher.schoolName === schoolFilterValue;
+    const searchMatch =
+      !searchValue ||
+      [
+        teacher.lastName,
+        teacher.firstName,
+        teacher.middleName,
+        teacher.suffixName,
+        teacher.schoolName,
+        teacher.department,
+        teacher.currentPosition,
+        teacher.email,
+        teacher.gender,
+        teacher.civilStatus,
+      ]
+        .join(" ")
+        .toLowerCase()
+        .includes(searchValue);
+
+    return schoolMatch && searchMatch;
+  });
 }
 
 async function handleInventoryTableClick(event) {
@@ -1423,7 +1548,7 @@ async function handleInventoryTableClick(event) {
   }
 
   if (nextPageButton) {
-    const totalPages = Math.max(1, Math.ceil(getFilteredInventoryItems().length / INVENTORY_PAGE_SIZE));
+    const totalPages = Math.max(1, Math.ceil(getFilteredInventoryItems().length / LISTING_PAGE_SIZE));
     currentInventoryPage = Math.min(totalPages, currentInventoryPage + 1);
     renderInventory();
     return;
@@ -1505,6 +1630,10 @@ function openEditModal(itemId) {
   document.querySelector("#editItemName").value = item.name;
   document.querySelector("#editItemCategory").value = item.category;
   document.querySelector("#editItemDescription").value = item.description || "";
+  document.querySelector("#editItemDateReceived").value = item.dateReceived || "";
+  document.querySelector("#editItemBrandName").value = item.brandName || "";
+  document.querySelector("#editItemBookTitle").value = item.bookTitle || "";
+  document.querySelector("#editItemBookPublisher").value = item.bookPublisher || "";
   document.querySelector("#editItemSchoolName").value = item.schoolName || "Landahan Elementary School";
   renderTeacherSelects();
   document.querySelector("#editItemTag").value = item.assetTag;
@@ -1554,6 +1683,10 @@ async function handleEditInventorySubmit(event) {
     name: document.querySelector("#editItemName").value.trim(),
     category: document.querySelector("#editItemCategory").value.trim(),
     description: document.querySelector("#editItemDescription").value.trim(),
+    dateReceived: document.querySelector("#editItemDateReceived").value,
+    brandName: document.querySelector("#editItemBrandName").value.trim(),
+    bookTitle: document.querySelector("#editItemBookTitle").value.trim(),
+    bookPublisher: document.querySelector("#editItemBookPublisher").value.trim(),
     schoolName: document.querySelector("#editItemSchoolName").value.trim(),
     assetTag: document.querySelector("#editItemTag").value.trim(),
     quantity: Math.max(1, Number(document.querySelector("#editItemQuantity").value) || 1),

@@ -3,14 +3,15 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -H 127.0.0.1",
+    "dev": "next dev --webpack -H 127.0.0.1",
     "build": "next build",
     "start": "next start -H 127.0.0.1",
     "start:legacy": "node server.js",
     "migrate:postgres": "node scripts/migrate-sqlite-to-postgres.js"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.104.0",
+    "@supabase/ssr": "^0.10.3",
+    "@supabase/supabase-js": "^2.106.2",
     "next": "^16.2.6",
     "pg": "^8.13.1",
     "react": "^19.2.6",

@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Teaching/Non-Teaching Personnel | School Inventory System</title>
+  <title>Teaching/Non-Teaching Personnel | SAiMS</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
@@ -17,7 +17,7 @@
   <div class="page-shell">
     <nav class="top-nav">
       <a class="nav-brand" href="index.html">
-        <img src="asset/logo.svg" alt="Landahan ES Inventory logo">
+        <img src="asset/logo.png" alt="SAiMS logo">
         <span>SAiMS</span>
       </a>
       <div class="nav-links">
@@ -46,6 +46,20 @@
           <div class="table-actions">
             <button id="downloadTeachersCsvBtn" class="primary-btn" type="button">Download CSV</button>
             <button id="openTeacherModalBtn" class="primary-btn" type="button">Add Personnel</button>
+          </div>
+        </div>
+        <div class="panel-heading">
+          <div class="filter-bar">
+            <label>
+              <span>School</span>
+              <select id="filterSchool">
+                <option value="All">All Schools</option>
+              </select>
+            </label>
+            <label>
+              <span>Search</span>
+              <input type="search" id="teacherSearchInput" placeholder="Name, school, position...">
+            </label>
           </div>
         </div>
         <div id="teacherList" class="card-list"></div>

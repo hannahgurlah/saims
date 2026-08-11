@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Inventory Item | School Inventory System</title>
+  <title>Inventory Item | SAiMS</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
@@ -17,7 +17,7 @@
   <div class="page-shell">
     <nav class="top-nav">
       <a class="nav-brand" href="index.html">
-        <img src="asset/logo.svg" alt="Landahan ES Inventory logo">
+        <img src="asset/logo.png" alt="SAiMS logo">
         <span>SAiMS</span>
       </a>
       <div class="nav-links">
@@ -84,6 +84,22 @@
             <label>
               <span>Description</span>
               <input type="text" id="itemDescription" placeholder="e.g. Epson projector with remote" required>
+            </label>
+            <label>
+              <span>Date Received</span>
+              <input type="date" id="itemDateReceived">
+            </label>
+            <label>
+              <span>Brand Name</span>
+              <input type="text" id="itemBrandName" placeholder="e.g. Epson">
+            </label>
+            <label>
+              <span>Book Title</span>
+              <input type="text" id="itemBookTitle" placeholder="e.g. Salindawa">
+            </label>
+            <label>
+              <span>Book Publisher</span>
+              <input type="text" id="itemBookPublisher" placeholder="e.g. DepEd Bureau of Learning Resources">
             </label>
           <label>
             <span>School Name</span>
@@ -198,15 +214,6 @@
         </form>
       </section>
 
-      <section class="panel top-gap">
-        <div class="panel-heading">
-          <div>
-            <p class="section-kicker">Inventory</p>
-            <h2>Saved Items</h2>
-          </div>
-        </div>
-        <div id="inventoryTableWrap" class="table-wrap"></div>
-      </section>
     </main>
   </div>
 
@@ -259,6 +266,22 @@
           <label>
             <span>Description</span>
             <input type="text" id="editItemDescription" required>
+          </label>
+          <label>
+            <span>Date Received</span>
+            <input type="date" id="editItemDateReceived">
+          </label>
+          <label>
+            <span>Brand Name</span>
+            <input type="text" id="editItemBrandName">
+          </label>
+          <label>
+            <span>Book Title</span>
+            <input type="text" id="editItemBookTitle">
+          </label>
+          <label>
+            <span>Book Publisher</span>
+            <input type="text" id="editItemBookPublisher">
           </label>
           <label>
             <span>School Name</span>

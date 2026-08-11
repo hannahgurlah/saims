@@ -107,6 +107,10 @@ async function main() {
             name,
             category,
             description,
+            date_received,
+            brand_name,
+            book_title,
+            book_publisher,
             asset_tag,
             quantity,
             quantity_per_property_card,
@@ -133,7 +137,7 @@ async function main() {
           ) VALUES (
             $1, $2, $3, $4, $5, $6, $7, $8, $9, $10,
             $11, $12, $13, $14, $15, $16, $17, $18, $19, $20,
-            $21, $22, $23, $24, $25, $26, $27
+            $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, $31
           )
         `,
         [
@@ -141,6 +145,10 @@ async function main() {
           item.name,
           item.category,
           item.description || "",
+          item.date_received || null,
+          item.brand_name || "",
+          item.book_title || "",
+          item.book_publisher || "",
           item.asset_tag,
           item.quantity,
           item.quantity_per_property_card || 0,

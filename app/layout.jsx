@@ -1,5 +1,5 @@
 export const metadata = {
-  title: "School Inventory System",
+  title: "SAiMS",
   description: "School inventory and personnel management system",
 };
 
