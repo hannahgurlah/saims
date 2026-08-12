@@ -7,9 +7,191 @@ const state = {
   },
   teachers: [],
   inventory: [],
+  bookCatalog: [],
+};
+
+const PROPERTY_CLASSIFICATIONS = {
+  "10": {
+    name: "Land Assets",
+    subcategories: [
+      { code: "10", name: "School Site / Titled Lots", uacsCode: "10601010" },
+      { code: "20", name: "Donated Land (Pending Title Transfer)", uacsCode: "10601010" },
+    ],
+  },
+  "11": {
+    name: "Land Improvements",
+    subcategories: [
+      { code: "10", name: "School Fences / Perimeter Walls", uacsCode: "10602000" },
+      { code: "20", name: "Drainage Systems / Concrete Pathways", uacsCode: "10602000" },
+      { code: "30", name: "School Gardens / Greenhouse", uacsCode: "10602000" },
+    ],
+  },
+  "40": {
+    name: "Buildings",
+    subcategories: [
+      { code: "10", name: "Standard School Buildings", uacsCode: "10604020" },
+      { code: "20", name: "Laboratories / Tech-Voc Workshops (Computer Labs, Home Economics Buildings)", uacsCode: "10604010" },
+      { code: "30", name: "Administrative Offices (Principal's Office, Faculty Rooms)", uacsCode: "10604010" },
+      { code: "99", name: "Other Structures (Covered Courts, Gymnasiums, Guardhouses)", uacsCode: "10604990" },
+    ],
+  },
+  "45": {
+    name: "General Machinery",
+    subcategories: [
+      { code: "10", name: "Grass Cutters / Lawn Mowers", uacsCode: "10605010" },
+      { code: "20", name: "Generator Sets (Power Backup)", uacsCode: "10605010" },
+      { code: "30", name: "Water Pumps / Tank Systems", uacsCode: "10605010" },
+    ],
+  },
+  "51": {
+    name: "Office Equipment",
+    subcategories: [
+      { code: "10", name: "Air Conditioning Units", uacsCode: "10605020" },
+      { code: "20", name: "Paper Shredders / Laminating Machines", uacsCode: "10605020" },
+      { code: "30", name: "Photocopiers / Mimeographing Equipment", uacsCode: "10605020" },
+      { code: "40", name: "Office Electric Fans", uacsCode: "10605020" },
+      { code: "50", name: "Other Office Equipment", uacsCode: "10605020" },
+    ],
+  },
+  "50": {
+    name: "Information and Communication Technology Equipment",
+    subcategories: [
+      { code: "10", name: "Desktop Computer Complete Package", uacsCode: "10605030" },
+      { code: "20", name: "Computer Printers / Scanners / 3D Printers", uacsCode: "10605030" },
+      { code: "30", name: "Laptop / Notebook Computer", uacsCode: "10605030" },
+      { code: "40", name: "Tablet Computer", uacsCode: "10605030" },
+      { code: "50", name: "Computer Monitor / Smart Display Panels", uacsCode: "10605030" },
+      { code: "60", name: "Servers / Network Switches / Routers", uacsCode: "10605030" },
+      { code: "70", name: "Uninterruptible Power Supply (UPS)", uacsCode: "10605030" },
+      { code: "80", name: "Multimedia Projectors", uacsCode: "10605030" },
+    ],
+  },
+  "46": {
+    name: "Agricultural and Forestry Equipment",
+    subcategories: [
+      { code: "10", name: "Hand Tractors / Power Tillers", uacsCode: "10605040" },
+      { code: "20", name: "Garden Tool Sets (Spades, Shovels, Wheelbarrows)", uacsCode: "10605040" },
+      { code: "30", name: "Hydroponics / Irrigation Tools [1]", uacsCode: "10605040" },
+    ],
+  },
+  "47": {
+    name: "Marine and Fishery Equipment",
+    subcategories: [
+      { code: "10", name: "Fishing Net Assemblies", uacsCode: "10605050" },
+      { code: "20", name: "Outboard Motors (for School Boats)", uacsCode: "10605050" },
+      { code: "30", name: "Fish Culture Tanks / Aquaponics Units", uacsCode: "10605050" },
+    ],
+  },
+  "48": {
+    name: "Airport Equipment",
+    subcategories: [
+      { code: "10", name: "Aviation Ground Training Tools", uacsCode: "10605060" },
+      { code: "99", name: "Other Airport/Aviation Support Tools", uacsCode: "10605060" },
+    ],
+  },
+  "53": {
+    name: "Communication Equipment",
+    subcategories: [
+      { code: "10", name: "Public Address Systems / Gym Sound Systems", uacsCode: "10605070" },
+      { code: "20", name: "Two-Way Handheld Radios (Security Walkie-Talkies)", uacsCode: "10605070" },
+      { code: "30", name: "Television Monitors (for Instructional/Classroom Use)", uacsCode: "10605070" },
+      { code: "40", name: "Megaphones / Audio Amplifiers", uacsCode: "10605070" },
+    ],
+  },
+  "49": {
+    name: "Construction and Heavy Equipment",
+    subcategories: [
+      { code: "10", name: "Concrete Mixers (Portable)", uacsCode: "10605080" },
+      { code: "20", name: "Welding Machines / Heavy Lathes", uacsCode: "10605080" },
+    ],
+  },
+  "57": {
+    name: "Disaster Response and Rescue Equipment",
+    subcategories: [
+      { code: "10", name: "Fire Extinguishers (Heavy-duty/Wall-mounted)", uacsCode: "10605090" },
+      { code: "20", name: "Emergency Rescue Kits / Spine Boards / Stretcher Units", uacsCode: "10605090" },
+      { code: "30", name: "Emergency Megaphones / Siren Systems", uacsCode: "10605090" },
+    ],
+  },
+  "58": {
+    name: "Military, Police and Security Equipment",
+    subcategories: [
+      { code: "10", name: "CCTV Camera Systems / Digital Video Recorders (DVR)", uacsCode: "10605100" },
+      { code: "20", name: "Metal Detectors (Handheld/Walk-through)", uacsCode: "10605100" },
+      { code: "30", name: "Training Rifles / Dummy Replicas (for CAT)", uacsCode: "10605100" },
+    ],
+  },
+  "54": {
+    name: "Medical and Dental Equipment",
+    subcategories: [
+      { code: "10", name: "Weighing Scales / Height Chart Scales", uacsCode: "10605110" },
+      { code: "20", name: "First Aid Storage Cabinets / Medical Tool Kits", uacsCode: "10605110" },
+      { code: "30", name: "Medical Emergency Beds / Wheelchairs (School Clinic)", uacsCode: "10605110" },
+      { code: "40", name: "Dental Chairs / Dental Inspection Kits", uacsCode: "10605110" },
+    ],
+  },
+  "59": {
+    name: "Printing Equipment",
+    subcategories: [
+      { code: "10", name: "Heavy-Duty Risograph / Digital Duplicators", uacsCode: "10605120" },
+      { code: "20", name: "Paper Cutters (Heavy Industrial)", uacsCode: "10605120" },
+      { code: "30", name: "Bookbinding Machines", uacsCode: "10605120" },
+    ],
+  },
+  "60": {
+    name: "Sports Equipment",
+    subcategories: [
+      { code: "10", name: "Basketball Goal Posts / Ring Assemblies", uacsCode: "10605130" },
+      { code: "20", name: "Volleyball Net Posts / Referee Chairs", uacsCode: "10605130" },
+      { code: "30", name: "Gymnastics Mats / Athletic Training Gear", uacsCode: "10605130" },
+      { code: "99", name: "Other Reusable Sports Assets", uacsCode: "10605130" },
+    ],
+  },
+  "61": {
+    name: "Technical and Scientific Equipment",
+    subcategories: [
+      { code: "10", name: "Science Lab Kit Sets (Microscopes, Hotplates)", uacsCode: "10605140" },
+      { code: "20", name: "Meteorological Tools (Weather Station Kits for Science High Schools)", uacsCode: "10605140" },
+      { code: "30", name: "Engineering/Drafting Tools", uacsCode: "10605140" },
+      { code: "40", name: "Musical Instruments (Drum & Lyre Kits, Pianos)", uacsCode: "10605140" },
+    ],
+  },
+  "69": {
+    name: "Other Machinery and Equipment",
+    subcategories: [
+      { code: "99", name: "Miscellaneous Unclassified School Machinery", uacsCode: "10605990" },
+      { categoryCode: "70", code: "20", name: "Culinary / Cookery Tools (Heavy Gas Ranges, Ovens for Senior High TVL)", uacsCode: "10605990" },
+    ],
+  },
+  "52": {
+    name: "Furniture and Fixtures",
+    subcategories: [
+      { code: "10", name: "Student Armchairs (Plastic Monobloc / Wood)", uacsCode: "10607010" },
+      { code: "20", name: "Teacher Desks / Office Tables / Conference Tables", uacsCode: "10607010" },
+      { code: "30", name: "Filing Cabinets (Steel / Lateral)", uacsCode: "10607010" },
+      { code: "40", name: "Whiteboards / Blackboards", uacsCode: "10607010" },
+      { code: "50", name: "Bookshelves / Library Storage Racks", uacsCode: "10607010" },
+      { code: "60", name: "Office Executive Chairs / Clerical Chairs", uacsCode: "10607010" },
+    ],
+  },
+  "55": {
+    name: "Books and Instructional Materials",
+    subcategories: [
+      { code: "10", name: "Standard Textbooks (Per Subject Area)", uacsCode: "10607020" },
+      { code: "20", name: "Reference Manuals / Dictionaries / Encyclopedias", uacsCode: "10607020" },
+      { code: "30", name: "Multimedia Learning Kits (Educational Flash Drives/DVD modules)", uacsCode: "10607020" },
+    ],
+  },
 };
 
 const navLinks = document.querySelector(".nav-links");
+
+if (navLinks) {
+  const currentPage = window.location.pathname.split("/").pop() || "index.html";
+  navLinks.querySelectorAll("a").forEach((link) => {
+    link.classList.toggle("active", link.getAttribute("href") === currentPage);
+  });
+}
 const loginForm = document.querySelector("#loginForm");
 const loginError = document.querySelector("#loginError");
 
@@ -39,6 +221,18 @@ const itemAcquiredType = document.querySelector("#itemAcquiredType");
 const itemAcquiredDetailsWrap = document.querySelector("#itemAcquiredDetailsWrap");
 const itemAcquiredDetailsLabel = document.querySelector("#itemAcquiredDetailsLabel");
 const itemAcquiredDetailsInput = document.querySelector("#itemAcquiredDetails");
+const itemCategoryInput = document.querySelector("#itemCategory");
+const itemSubcategoryInput = document.querySelector("#itemSubcategory");
+const itemBookTitleInput = document.querySelector("#itemBookTitle");
+const itemBrandNameInput = document.querySelector("#itemBrandName");
+const itemBookAuthorInput = document.querySelector("#itemBookAuthor");
+const itemBookPublisherInput = document.querySelector("#itemBookPublisher");
+const itemModelNumberInput = document.querySelector("#itemModelNumber");
+const itemSerialNumberInput = document.querySelector("#itemSerialNumber");
+const itemFormInput = document.querySelector("#itemForm");
+const itemBundleItemsWrap = document.querySelector("#itemBundleItemsWrap");
+const itemBundleItemLines = document.querySelector("#itemBundleItemLines");
+const addBundleItemLineBtn = document.querySelector("#addBundleItemLineBtn");
 
 const filterTeacher = document.querySelector("#filterTeacher");
 const filterStatus = document.querySelector("#filterStatus");
@@ -50,7 +244,9 @@ const inventoryTableWrap = document.querySelector("#inventoryTableWrap");
 const downloadCsvBtn = document.querySelector("#downloadCsvBtn");
 const downloadTeachersCsvBtn = document.querySelector("#downloadTeachersCsvBtn");
 const downloadStockCardCsvBtn = document.querySelector("#downloadStockCardCsvBtn");
+const downloadIirupReportBtn = document.querySelector("#downloadIirupReportBtn");
 const downloadPpeReportBtn = document.querySelector("#downloadPpeReportBtn");
+const downloadInventoryReportBtn = document.querySelector("#downloadInventoryReportBtn");
 const downloadSemiExpendableReportBtn = document.querySelector("#downloadSemiExpendableReportBtn");
 const stockCardItemTitle = document.querySelector("#stockCardItemTitle");
 const stockCardItemSummary = document.querySelector("#stockCardItemSummary");
@@ -58,6 +254,7 @@ const stockMovementTableWrap = document.querySelector("#stockMovementTableWrap")
 
 const heroStats = document.querySelector("#heroStats");
 const isHomePage = window.location.pathname.endsWith("/index.html") || window.location.pathname === "/" || window.location.pathname.endsWith("index.html");
+const isDashboardPage = window.location.pathname.endsWith("/dashboard.html") || window.location.pathname.endsWith("dashboard.html");
 const isLoginPage = window.location.pathname.endsWith("/login.html") || window.location.pathname.endsWith("login.html");
 const isStockCardPage = window.location.pathname.endsWith("/stock-card.html") || window.location.pathname.endsWith("stock-card.html");
 const isInventoryItemPage = window.location.pathname.endsWith("/inventory-item.html") || window.location.pathname.endsWith("inventory-item.html");
@@ -89,6 +286,18 @@ const editItemAcquiredType = document.querySelector("#editItemAcquiredType");
 const editItemAcquiredDetailsWrap = document.querySelector("#editItemAcquiredDetailsWrap");
 const editItemAcquiredDetailsLabel = document.querySelector("#editItemAcquiredDetailsLabel");
 const editItemAcquiredDetailsInput = document.querySelector("#editItemAcquiredDetails");
+const editItemCategoryInput = document.querySelector("#editItemCategory");
+const editItemSubcategoryInput = document.querySelector("#editItemSubcategory");
+const editItemBookTitleInput = document.querySelector("#editItemBookTitle");
+const editItemBrandNameInput = document.querySelector("#editItemBrandName");
+const editItemBookAuthorInput = document.querySelector("#editItemBookAuthor");
+const editItemBookPublisherInput = document.querySelector("#editItemBookPublisher");
+const editItemModelNumberInput = document.querySelector("#editItemModelNumber");
+const editItemSerialNumberInput = document.querySelector("#editItemSerialNumber");
+const editItemFormInput = document.querySelector("#editItemForm");
+const editItemBundleItemsWrap = document.querySelector("#editItemBundleItemsWrap");
+const editItemBundleItemLines = document.querySelector("#editItemBundleItemLines");
+const editAddBundleItemLineBtn = document.querySelector("#editAddBundleItemLineBtn");
 let editingItemId = "";
 let editingTeacherId = "";
 let stockMovementItemId = "";
@@ -182,6 +391,50 @@ if (itemAcquiredType) {
   itemAcquiredType.addEventListener("change", () => updateAcquiredDetailsUI(""));
 }
 
+if (itemFormInput) {
+  itemFormInput.addEventListener("change", () => updateBundleItemsUI(""));
+}
+
+if (addBundleItemLineBtn) {
+  addBundleItemLineBtn.addEventListener("click", () => addBundleItemLine(""));
+}
+
+if (editAddBundleItemLineBtn) {
+  editAddBundleItemLineBtn.addEventListener("click", () => addBundleItemLine("edit"));
+}
+
+if (itemBundleItemLines) {
+  itemBundleItemLines.addEventListener("click", (event) => handleBundleItemLineClick(event, ""));
+}
+
+if (editItemBundleItemLines) {
+  editItemBundleItemLines.addEventListener("click", (event) => handleBundleItemLineClick(event, "edit"));
+}
+
+if (itemCategoryInput) {
+  itemCategoryInput.addEventListener("change", () => {
+    updateBookFieldsUI("");
+    updateSubcategoryUI("");
+    updateEquipmentFieldsUI("");
+  });
+}
+
+if (itemBookTitleInput) {
+  itemBookTitleInput.addEventListener("change", () => applyBookCatalogMatch(""));
+}
+
+if (editItemBookTitleInput) {
+  editItemBookTitleInput.addEventListener("change", () => applyBookCatalogMatch("edit"));
+}
+
+if (itemSubcategoryInput) {
+  itemSubcategoryInput.addEventListener("change", () => {
+    applyPropertyClassification("");
+    updateBookFieldsUI("");
+    updateEquipmentFieldsUI("");
+  });
+}
+
 if (inventoryTableWrap) {
   inventoryTableWrap.addEventListener("click", handleInventoryTableClick);
 }
@@ -221,6 +474,26 @@ if (editItemAmountInput) {
 
 if (editItemAcquiredType) {
   editItemAcquiredType.addEventListener("change", () => updateAcquiredDetailsUI("edit"));
+}
+
+if (editItemFormInput) {
+  editItemFormInput.addEventListener("change", () => updateBundleItemsUI("edit"));
+}
+
+if (editItemCategoryInput) {
+  editItemCategoryInput.addEventListener("change", () => {
+    updateBookFieldsUI("edit");
+    updateSubcategoryUI("edit");
+    updateEquipmentFieldsUI("edit");
+  });
+}
+
+if (editItemSubcategoryInput) {
+  editItemSubcategoryInput.addEventListener("change", () => {
+    applyPropertyClassification("edit");
+    updateBookFieldsUI("edit");
+    updateEquipmentFieldsUI("edit");
+  });
 }
 
 if (closeModalBtn) {
@@ -295,6 +568,14 @@ if (downloadPpeReportBtn) {
   downloadPpeReportBtn.addEventListener("click", downloadPpeReportCsv);
 }
 
+if (downloadIirupReportBtn) {
+  downloadIirupReportBtn.addEventListener("click", downloadIirupReportCsv);
+}
+
+if (downloadInventoryReportBtn) {
+  downloadInventoryReportBtn.addEventListener("click", downloadInventoryReportCsv);
+}
+
 if (downloadSemiExpendableReportBtn) {
   downloadSemiExpendableReportBtn.addEventListener("click", downloadSemiExpendableReportCsv);
 }
@@ -303,6 +584,8 @@ if (loginForm) {
   loginForm.addEventListener("submit", handleLoginSubmit);
 }
 
+renderCategoryOptions();
+reorderAddInventoryFields();
 initializeApp();
 
 async function initializeApp() {
@@ -312,6 +595,13 @@ async function initializeApp() {
     if (isLoginPage) {
       if (state.auth.authenticated) {
         window.location.replace(getPostLoginDestination());
+      }
+      return;
+    }
+
+    if (isHomePage) {
+      if (state.auth.authenticated) {
+        window.location.replace("dashboard.html");
       }
       return;
     }
@@ -340,13 +630,15 @@ async function refreshSession() {
 }
 
 async function refreshData() {
-  const [teachers, inventory] = await Promise.all([
+  const [teachers, inventory, bookCatalog] = await Promise.all([
     apiFetch("/api/teachers"),
     apiFetch("/api/inventory"),
+    apiFetch("/api/books"),
   ]);
 
   state.teachers = teachers;
   state.inventory = inventory;
+  state.bookCatalog = bookCatalog;
 
   if (isStockCardItemPage) {
     await refreshStockCardItemHistory();
@@ -392,6 +684,8 @@ function render() {
   renderStockCardItemPage();
   updateCreateTotalAmount();
   updateAcquiredDetailsUI("");
+  updateSchoolFieldVisibility();
+  renderBookAutocomplete();
 }
 
 function renderAccessMode() {
@@ -543,7 +837,7 @@ async function handleLogoutClick() {
     role: "",
     schoolName: "",
   };
-  redirectToLogin();
+  window.location.replace("index.html");
 }
 
 function redirectToLogin() {
@@ -553,7 +847,10 @@ function redirectToLogin() {
 
 function getPostLoginDestination() {
   const next = new URLSearchParams(window.location.search).get("next");
-  return next || "index.html";
+  if (!next || next === "/" || next.endsWith("/index.html") || next === "index.html" || next.includes("login.html")) {
+    return "dashboard.html";
+  }
+  return next;
 }
 
 function showLoginError(message) {
@@ -686,6 +983,16 @@ function renderSchoolAutocomplete() {
     const selectedSchool = state.auth.role === "manager" && state.auth.schoolName
       ? state.auth.schoolName
       : input.value || "Landahan Elementary School";
+
+    if (input.tagName === "SELECT") {
+      input.innerHTML = [
+        '<option value="">Select school</option>',
+        ...schoolNames.map((schoolName) => `<option value="${escapeHtml(schoolName)}">${escapeHtml(schoolName)}</option>`),
+      ].join("");
+      input.value = schoolNames.includes(selectedSchool) ? selectedSchool : "";
+      input.disabled = state.auth.role === "manager" && Boolean(state.auth.schoolName);
+      return;
+    }
 
     input.setAttribute("list", "schoolNameOptions");
     input.value = selectedSchool;
@@ -888,11 +1195,19 @@ async function handleInventorySubmit(event) {
 
   const item = {
     name: document.querySelector("#itemName").value.trim(),
-    category: document.querySelector("#itemCategory").value.trim(),
+    itemForm: itemFormInput.value,
+    bundleItems: getBundleItemsValue(""),
+    category: getSelectedCategoryName(""),
+    subcategory: itemSubcategoryInput.value,
+    categoryCode: document.querySelector("#itemCategoryCode").value,
+    subcategoryCode: document.querySelector("#itemSubcategoryCode").value,
     description: document.querySelector("#itemDescription").value.trim(),
     dateReceived: document.querySelector("#itemDateReceived").value,
     brandName: document.querySelector("#itemBrandName").value.trim(),
+    modelNumber: itemModelNumberInput.value.trim(),
+    serialNumber: itemSerialNumberInput.value.trim(),
     bookTitle: document.querySelector("#itemBookTitle").value.trim(),
+    bookAuthor: itemBookAuthorInput.value.trim(),
     bookPublisher: document.querySelector("#itemBookPublisher").value.trim(),
     schoolName: document.querySelector("#itemSchoolName").value.trim(),
     assetTag: document.querySelector("#itemTag").value.trim(),
@@ -909,10 +1224,12 @@ async function handleInventorySubmit(event) {
     icsNumberDistribute: document.querySelector("#itemIcsNumberDistribute").value.trim(),
     referenceNumber: document.querySelector("#itemReferenceNumber").value.trim(),
     assetType: document.querySelector("#itemAssetType").value,
-    acquiredType: document.querySelector("#itemAcquiredType").value,
+    acquisitionType: document.querySelector("#itemAcquiredType").value,
+    acquiredType: toLegacyAcquiredType(document.querySelector("#itemAcquiredType").value),
     acquiredDetails: getAcquiredDetailsValue(""),
     location: document.querySelector("#itemLocation").value.trim(),
-    status: getStatusForAssignment(selectedStatus, teacherId),
+    propertyCondition: selectedStatus,
+    status: getStatusForAssignment(mapPropertyConditionToStatus(selectedStatus), teacherId),
     teacherId,
     assignedDate: normalizeAssignedDate(document.querySelector("#itemAssignedDate").value, teacherId),
     notes: document.querySelector("#itemNotes").value.trim(),
@@ -937,8 +1254,13 @@ async function handleInventorySubmit(event) {
     document.querySelector("#itemUnit").value = "";
     document.querySelector("#itemSchoolName").value = "Landahan Elementary School";
     document.querySelector("#itemAssetType").value = "PPE";
+    itemFormInput.value = "Single";
+    updateBundleItemsUI("");
+    updateBookFieldsUI("");
+    updateEquipmentFieldsUI("");
+    updateSubcategoryUI("");
     document.querySelector("#itemAcquiredType").value = "Purchase";
-    document.querySelector("#itemStatus").value = "Available";
+    document.querySelector("#itemStatus").value = "Working/Available";
     updateCreateTotalAmount();
     validateCreateUsabilityBreakdown();
     updateAcquiredDetailsUI("");
@@ -1010,7 +1332,7 @@ function renderInventory() {
                   <span class="notes">${escapeHtml(item.description || "No description")}</span>
                 </td>
                 <td>${escapeHtml(item.assetTag)}</td>
-                <td>${escapeHtml(item.category)}${!isStockCardPage ? `<br><span class="notes">UACS: ${escapeHtml(item.uacsCode || "-")}</span>` : ""}</td>
+                <td>${escapeHtml(item.category)}${item.subcategory ? `<br><span class="notes">${escapeHtml(item.subcategory)}</span>` : ""}${!isStockCardPage ? `<br><span class="notes">Codes: ${escapeHtml(item.categoryCode || "-")}-${escapeHtml(item.subcategoryCode || "-")}</span><br><span class="notes">UACS: ${escapeHtml(item.uacsCode || "-")}</span>` : ""}</td>
                 ${isStockCardPage ? `<td>${escapeHtml(item.description || "No description")}</td>` : ""}
                 ${isStockCardPage ? `<td>${escapeHtml(item.unitOfMeasurement || "unit")}</td>` : ""}
                 ${isStockCardPage ? `<td><strong>${item.quantity}</strong></td>` : ""}
@@ -1021,10 +1343,16 @@ function renderInventory() {
                       : `<span class="notes">School: ${escapeHtml(item.schoolName || "-")}</span><br>
                   <span class="notes">Date Received: ${escapeHtml(item.dateReceived || "-")}</span><br>
                   <span class="notes">Brand Name: ${escapeHtml(item.brandName || "-")}</span><br>
+                  <span class="notes">Model: ${escapeHtml(item.modelNumber || "-")}</span><br>
+                  <span class="notes">Serial Number: ${escapeHtml(item.serialNumber || "-")}</span><br>
                   <span class="notes">Book Title: ${escapeHtml(item.bookTitle || "-")}</span><br>
+                  <span class="notes">Book Author: ${escapeHtml(item.bookAuthor || "-")}</span><br>
                   <span class="notes">Book Publisher: ${escapeHtml(item.bookPublisher || "-")}</span><br>
-                  <span class="notes">Type of Item: ${escapeHtml(formatItemTypeLabel(item.assetType || "-"))}</span><br>
-                  <span class="notes">Acquired: ${escapeHtml(item.acquiredType || "-")}</span><br>
+                  <span class="notes">Item Type: ${escapeHtml(item.itemForm || "Single")}</span><br>
+                  ${item.itemForm === "Bundle/Package" ? `<span class="notes">Bundle Items:</span><ul class="notes">${getBundleItems(item.bundleItems).map((bundleItem) => `<li>${bundleItem.quantity} × ${escapeHtml(bundleItem.name)}</li>`).join("")}</ul>` : ""}
+                  <span class="notes">Property Classification: ${escapeHtml(formatItemTypeLabel(item.assetType || "-"))}</span><br>
+                  <span class="notes">Acquisition Type: ${escapeHtml(item.acquisitionType || normalizeAcquisitionType(item.acquiredType))}</span><br>
+                  <span class="notes">Property Status: ${escapeHtml(item.propertyCondition || getPropertyConditionFromStatus(item.status))}</span><br>
                   <span class="notes">Acquired Details: ${escapeHtml(item.acquiredDetails || "-")}</span><br>
                   <span class="notes">${formatCurrency(item.amount)}</span><br>
                   <span class="notes">Total amount: ${formatCurrency(getInventoryTotalAmount(item))}</span><br>
@@ -1092,11 +1420,19 @@ function getFilteredInventoryItems() {
       !searchValue ||
       [
         item.name,
+        item.itemForm,
+        item.bundleItems,
         item.category,
+        item.subcategory,
+        item.categoryCode,
+        item.subcategoryCode,
         item.description,
         item.dateReceived,
         item.brandName,
+        item.modelNumber,
+        item.serialNumber,
         item.bookTitle,
+        item.bookAuthor,
         item.bookPublisher,
         item.assetTag,
         item.location,
@@ -1133,11 +1469,19 @@ function downloadInventoryCsv() {
   const rows = [
     [
       "Item Name",
+      "Item Type",
+      "Items Included in Bundle/Package",
       "Category",
+      "Sub-Category",
+      "Category Code",
+      "Sub-Category Code",
       "Description",
       "Date Received",
       "Brand Name",
+      "Model",
+      "Serial Number",
       "Book Title",
+      "Book Author",
       "Book Publisher",
       "School Name",
       "Property Number",
@@ -1168,12 +1512,20 @@ function downloadInventoryCsv() {
 
       return [
         item.name,
-        item.category,
-        item.description || "",
+        item.itemForm || "Single",
+        item.bundleItems || "",
+      item.category,
+      item.subcategory || "",
+      item.categoryCode || "",
+      item.subcategoryCode || "",
+      item.description || "",
         item.dateReceived || "",
-        item.brandName || "",
-        item.bookTitle || "",
-        item.bookPublisher || "",
+      item.brandName || "",
+      item.modelNumber || "",
+      item.serialNumber || "",
+      item.bookTitle || "",
+      item.bookAuthor || "",
+      item.bookPublisher || "",
         item.schoolName || "",
         item.assetTag,
         item.quantity,
@@ -1281,10 +1633,16 @@ function downloadStockCardCsv() {
     [
       "Item Name",
       "Category",
+      "Sub-Category",
+      "Category Code",
+      "Sub-Category Code",
       "Description",
       "Date Received",
       "Brand Name",
+      "Model",
+      "Serial Number",
       "Book Title",
+      "Book Author",
       "Book Publisher",
       "School Name",
       "Property Number",
@@ -1297,10 +1655,16 @@ function downloadStockCardCsv() {
     ...filteredItems.map((item) => [
       item.name,
       item.category,
+      item.subcategory || "",
+      item.categoryCode || "",
+      item.subcategoryCode || "",
       item.description || "",
       item.dateReceived || "",
       item.brandName || "",
+      item.modelNumber || "",
+      item.serialNumber || "",
       item.bookTitle || "",
+      item.bookAuthor || "",
       item.bookPublisher || "",
       item.schoolName || "",
       item.assetTag,
@@ -1327,10 +1691,16 @@ function downloadPpeReportCsv() {
     [
       "Item Name",
       "Category",
+      "Sub-Category",
+      "Category Code",
+      "Sub-Category Code",
       "Description",
       "Date Received",
       "Brand Name",
+      "Model",
+      "Serial Number",
       "Book Title",
+      "Book Author",
       "Book Publisher",
       "School Name",
       "Property Number",
@@ -1360,12 +1730,18 @@ function downloadPpeReportCsv() {
 
       return [
         item.name,
-        item.category,
-        item.description || "",
+      item.category,
+      item.subcategory || "",
+      item.categoryCode || "",
+      item.subcategoryCode || "",
+      item.description || "",
         item.dateReceived || "",
-        item.brandName || "",
-        item.bookTitle || "",
-        item.bookPublisher || "",
+      item.brandName || "",
+      item.modelNumber || "",
+      item.serialNumber || "",
+      item.bookTitle || "",
+      item.bookAuthor || "",
+      item.bookPublisher || "",
         item.schoolName || "",
         item.assetTag,
         item.quantity,
@@ -1395,6 +1771,151 @@ function downloadPpeReportCsv() {
   downloadCsvFile(rows, `ppe-physical-count-report-${todayISO()}.csv`);
 }
 
+function downloadIirupReportCsv() {
+  const unserviceableItems = state.inventory.filter((item) => Number(item.nonUsableCount) > 0);
+
+  if (!unserviceableItems.length) {
+    window.alert("There are no unserviceable property items to export.");
+    return;
+  }
+
+  const rows = [
+    [
+      "Item Name",
+      "Category",
+      "Sub-Category",
+      "Category Code",
+      "Sub-Category Code",
+      "Description",
+      "Date Received",
+      "School Name",
+      "Property Number",
+      "Asset Type",
+      "No. of Non-usable",
+      "Unit of Measurement",
+      "Price per Item",
+      "Total Value of Unserviceable Property",
+      "UACS Code",
+      "Fund Cluster Code",
+      "Status",
+      "Assigned Personnel",
+      "Location",
+      "Notes",
+    ],
+    ...unserviceableItems.map((item) => {
+      const teacher = state.teachers.find((entry) => entry.id === item.teacherId);
+      const nonUsableCount = Number(item.nonUsableCount) || 0;
+
+      return [
+        item.name,
+      item.category,
+      item.subcategory || "",
+      item.categoryCode || "",
+      item.subcategoryCode || "",
+      item.description || "",
+        item.dateReceived || "",
+        item.schoolName || "",
+        item.assetTag,
+        formatItemTypeLabel(item.assetType),
+        nonUsableCount,
+        item.unitOfMeasurement || "",
+        Number(item.amount) || 0,
+        nonUsableCount * (Number(item.amount) || 0),
+        item.uacsCode || "",
+        item.fundClusterCode || "",
+        formatStatusLabel(item.status),
+        teacher ? getTeacherDisplayName(teacher) : "",
+        item.location || "",
+        item.notes || "",
+      ];
+    }),
+  ];
+
+  downloadCsvFile(rows, `iirup-report-${todayISO()}.csv`);
+}
+
+function downloadInventoryReportCsv() {
+  const inventoryItems = state.inventory.filter((item) => item.assetType === "Not Expandable");
+
+  if (!inventoryItems.length) {
+    window.alert("There are no inventory items to export.");
+    return;
+  }
+
+  const rows = [
+    [
+      "Item Name",
+      "Category",
+      "Sub-Category",
+      "Category Code",
+      "Sub-Category Code",
+      "Description",
+      "Date Received",
+      "Brand Name",
+      "Model",
+      "Serial Number",
+      "Book Title",
+      "Book Author",
+      "Book Publisher",
+      "School Name",
+      "Property Number",
+      "Quantity",
+      "Quantity per Physical Count",
+      "No. of Usable",
+      "No. of Non-usable",
+      "Unit of Measurement",
+      "Price per Item",
+      "Total Amount",
+      "UACS Code",
+      "Fund Cluster Code",
+      "Reference Number",
+      "Status",
+      "Assigned Personnel",
+      "Current Position",
+      "Location",
+      "Notes",
+    ],
+    ...inventoryItems.map((item) => {
+      const teacher = state.teachers.find((entry) => entry.id === item.teacherId);
+
+      return [
+        item.name,
+      item.category,
+      item.subcategory || "",
+      item.categoryCode || "",
+      item.subcategoryCode || "",
+      item.description || "",
+        item.dateReceived || "",
+      item.brandName || "",
+      item.modelNumber || "",
+      item.serialNumber || "",
+      item.bookTitle || "",
+      item.bookAuthor || "",
+      item.bookPublisher || "",
+        item.schoolName || "",
+        item.assetTag,
+        item.quantity,
+        item.quantityPerPhysicalCount ?? 0,
+        item.usableCount ?? 0,
+        item.nonUsableCount ?? 0,
+        item.unitOfMeasurement || "",
+        Number(item.amount) || 0,
+        getInventoryTotalAmount(item),
+        item.uacsCode || "",
+        item.fundClusterCode || "",
+        item.referenceNumber || "",
+        formatStatusLabel(item.status),
+        teacher ? getTeacherDisplayName(teacher) : "",
+        teacher ? teacher.currentPosition || "" : "",
+        item.location || "",
+        item.notes || "",
+      ];
+    }),
+  ];
+
+  downloadCsvFile(rows, `rpci-report-${todayISO()}.csv`);
+}
+
 function downloadSemiExpendableReportCsv() {
   const semiExpendableItems = state.inventory.filter((item) => item.assetType === "Semi-Expandable");
 
@@ -1410,7 +1931,10 @@ function downloadSemiExpendableReportCsv() {
       "Description",
       "Date Received",
       "Brand Name",
+      "Model",
+      "Serial Number",
       "Book Title",
+      "Book Author",
       "Book Publisher",
       "School Name",
       "Property Number",
@@ -1443,9 +1967,12 @@ function downloadSemiExpendableReportCsv() {
         item.category,
         item.description || "",
         item.dateReceived || "",
-        item.brandName || "",
-        item.bookTitle || "",
-        item.bookPublisher || "",
+      item.brandName || "",
+      item.modelNumber || "",
+      item.serialNumber || "",
+      item.bookTitle || "",
+      item.bookAuthor || "",
+      item.bookPublisher || "",
         item.schoolName || "",
         item.assetTag,
         item.quantity,
@@ -1628,12 +2155,23 @@ function openEditModal(itemId) {
 
   editingItemId = item.id;
   document.querySelector("#editItemName").value = item.name;
-  document.querySelector("#editItemCategory").value = item.category;
+  editItemFormInput.value = item.itemForm || "Single";
+  renderBundleItemLines("edit", getBundleItems(item.bundleItems));
+  updateBundleItemsUI("edit");
+  document.querySelector("#editItemCategory").value = getCategoryCodeForItem(item);
+  updateSubcategoryUI("edit", item.subcategory || "");
+  document.querySelector("#editItemCategoryCode").value = item.categoryCode || "";
+  document.querySelector("#editItemSubcategoryCode").value = item.subcategoryCode || "";
   document.querySelector("#editItemDescription").value = item.description || "";
   document.querySelector("#editItemDateReceived").value = item.dateReceived || "";
   document.querySelector("#editItemBrandName").value = item.brandName || "";
+  editItemModelNumberInput.value = item.modelNumber || "";
+  editItemSerialNumberInput.value = item.serialNumber || "";
   document.querySelector("#editItemBookTitle").value = item.bookTitle || "";
+  editItemBookAuthorInput.value = item.bookAuthor || "";
   document.querySelector("#editItemBookPublisher").value = item.bookPublisher || "";
+  updateBookFieldsUI("edit");
+  updateEquipmentFieldsUI("edit");
   document.querySelector("#editItemSchoolName").value = item.schoolName || "Landahan Elementary School";
   renderTeacherSelects();
   document.querySelector("#editItemTag").value = item.assetTag;
@@ -1652,11 +2190,11 @@ function openEditModal(itemId) {
   document.querySelector("#editItemIcsNumberDistribute").value = item.icsNumberDistribute || "";
   document.querySelector("#editItemReferenceNumber").value = item.referenceNumber || "";
   document.querySelector("#editItemAssetType").value = item.assetType || "PPE";
-  document.querySelector("#editItemAcquiredType").value = item.acquiredType || "Not Applicable";
+  document.querySelector("#editItemAcquiredType").value = item.acquisitionType || normalizeAcquisitionType(item.acquiredType);
   document.querySelector("#editItemAcquiredDetails").value = item.acquiredDetails || "";
   updateAcquiredDetailsUI("edit");
   document.querySelector("#editItemLocation").value = item.location;
-  document.querySelector("#editItemStatus").value = item.status;
+  document.querySelector("#editItemStatus").value = item.propertyCondition || getPropertyConditionFromStatus(item.status);
   editItemTeacher.value = item.teacherId || "";
   document.querySelector("#editItemAssignedDate").value = item.assignedDate || "";
   document.querySelector("#editItemNotes").value = item.notes || "";
@@ -1681,11 +2219,19 @@ async function handleEditInventorySubmit(event) {
   const teacherId = editItemTeacher.value;
   const updatedItem = {
     name: document.querySelector("#editItemName").value.trim(),
-    category: document.querySelector("#editItemCategory").value.trim(),
+    itemForm: editItemFormInput.value,
+    bundleItems: getBundleItemsValue("edit"),
+    category: getSelectedCategoryName("edit"),
+    subcategory: editItemSubcategoryInput.value,
+    categoryCode: document.querySelector("#editItemCategoryCode").value,
+    subcategoryCode: document.querySelector("#editItemSubcategoryCode").value,
     description: document.querySelector("#editItemDescription").value.trim(),
     dateReceived: document.querySelector("#editItemDateReceived").value,
     brandName: document.querySelector("#editItemBrandName").value.trim(),
+    modelNumber: editItemModelNumberInput.value.trim(),
+    serialNumber: editItemSerialNumberInput.value.trim(),
     bookTitle: document.querySelector("#editItemBookTitle").value.trim(),
+    bookAuthor: editItemBookAuthorInput.value.trim(),
     bookPublisher: document.querySelector("#editItemBookPublisher").value.trim(),
     schoolName: document.querySelector("#editItemSchoolName").value.trim(),
     assetTag: document.querySelector("#editItemTag").value.trim(),
@@ -1702,10 +2248,12 @@ async function handleEditInventorySubmit(event) {
     icsNumberDistribute: document.querySelector("#editItemIcsNumberDistribute").value.trim(),
     referenceNumber: document.querySelector("#editItemReferenceNumber").value.trim(),
     assetType: document.querySelector("#editItemAssetType").value,
-    acquiredType: document.querySelector("#editItemAcquiredType").value,
+    acquisitionType: document.querySelector("#editItemAcquiredType").value,
+    acquiredType: toLegacyAcquiredType(document.querySelector("#editItemAcquiredType").value),
     acquiredDetails: getAcquiredDetailsValue("edit"),
     location: document.querySelector("#editItemLocation").value.trim(),
-    status: getStatusForAssignment(document.querySelector("#editItemStatus").value, teacherId),
+    propertyCondition: document.querySelector("#editItemStatus").value,
+    status: getStatusForAssignment(mapPropertyConditionToStatus(document.querySelector("#editItemStatus").value), teacherId),
     teacherId,
     assignedDate: normalizeAssignedDate(document.querySelector("#editItemAssignedDate").value, teacherId),
     notes: document.querySelector("#editItemNotes").value.trim(),
@@ -2060,6 +2608,380 @@ function validateUsabilityBreakdown(prefix, showAlert = false) {
   return isValid;
 }
 
+function getBundleItems(value) {
+  if (Array.isArray(value)) {
+    return value;
+  }
+
+  try {
+    const parsed = JSON.parse(value || "[]");
+    if (Array.isArray(parsed)) {
+      return parsed
+        .map((item) => ({ name: String(item.name || "").trim(), quantity: Math.max(1, Number(item.quantity) || 1) }))
+        .filter((item) => item.name);
+    }
+  } catch {
+    // Older bundle records used one item per line.
+  }
+
+  return String(value || "")
+    .split("\n")
+    .map((name) => ({ name: name.trim(), quantity: 1 }))
+    .filter((item) => item.name);
+}
+
+function getBundleItemsValue(prefix) {
+  const typeSelect = prefix === "edit" ? editItemFormInput : itemFormInput;
+  const lines = prefix === "edit" ? editItemBundleItemLines : itemBundleItemLines;
+
+  if (typeSelect?.value !== "Bundle/Package" || !lines) {
+    return "";
+  }
+
+  const items = [...lines.querySelectorAll(".bundle-item-line")].map((line) => ({
+    name: line.querySelector('[data-bundle-field="name"]').value.trim(),
+    quantity: Math.max(1, Number(line.querySelector('[data-bundle-field="quantity"]').value) || 1),
+  }));
+
+  return JSON.stringify(items);
+}
+
+function updateBundleItemsUI(prefix) {
+  const typeSelect = prefix === "edit" ? editItemFormInput : itemFormInput;
+  const wrap = prefix === "edit" ? editItemBundleItemsWrap : itemBundleItemsWrap;
+  const lines = prefix === "edit" ? editItemBundleItemLines : itemBundleItemLines;
+
+  if (!typeSelect || !wrap || !lines) {
+    return;
+  }
+
+  const isBundle = typeSelect.value === "Bundle/Package";
+  wrap.classList.toggle("hidden", !isBundle);
+
+  if (!isBundle) {
+    lines.innerHTML = "";
+    return;
+  }
+
+  if (!lines.children.length) {
+    addBundleItemLine(prefix);
+  }
+}
+
+function addBundleItemLine(prefix, item = { name: "", quantity: 1 }) {
+  const lines = prefix === "edit" ? editItemBundleItemLines : itemBundleItemLines;
+  if (!lines) {
+    return;
+  }
+
+  const line = document.createElement("div");
+  line.className = "bundle-item-line";
+  line.innerHTML = `
+    <label>
+      <span>Item Name</span>
+      <input type="text" data-bundle-field="name" value="${escapeHtmlAttribute(item.name || "")}" required>
+    </label>
+    <label>
+      <span>Quantity</span>
+      <input type="number" data-bundle-field="quantity" min="1" value="${Math.max(1, Number(item.quantity) || 1)}" required>
+    </label>
+    <button class="ghost-btn" type="button" data-action="remove-bundle-item">Remove</button>
+  `;
+  lines.append(line);
+}
+
+function renderBundleItemLines(prefix, items) {
+  const lines = prefix === "edit" ? editItemBundleItemLines : itemBundleItemLines;
+  if (!lines) {
+    return;
+  }
+
+  lines.innerHTML = "";
+  items.forEach((item) => addBundleItemLine(prefix, item));
+}
+
+function handleBundleItemLineClick(event, prefix) {
+  const removeButton = event.target.closest('[data-action="remove-bundle-item"]');
+  if (!removeButton) {
+    return;
+  }
+
+  const lines = prefix === "edit" ? editItemBundleItemLines : itemBundleItemLines;
+  removeButton.closest(".bundle-item-line")?.remove();
+
+  if (lines && !lines.children.length) {
+    addBundleItemLine(prefix);
+  }
+}
+
+function updateBookFieldsUI(prefix) {
+  const categoryInput = prefix === "edit" ? editItemCategoryInput : itemCategoryInput;
+  const subcategoryInput = prefix === "edit" ? editItemSubcategoryInput : itemSubcategoryInput;
+  const titleInput = prefix === "edit" ? editItemBookTitleInput : itemBookTitleInput;
+  const authorInput = prefix === "edit" ? editItemBookAuthorInput : itemBookAuthorInput;
+  const publisherInput = prefix === "edit" ? editItemBookPublisherInput : itemBookPublisherInput;
+  const selectedSubcategory = PROPERTY_CLASSIFICATIONS[categoryInput?.value]?.subcategories
+    .find((entry) => entry.name === subcategoryInput?.value);
+  const isStandardTextbook = categoryInput?.value === "55" && selectedSubcategory?.code === "10";
+  const isReferenceMaterial = categoryInput?.value === "55" && selectedSubcategory?.code === "20";
+
+  [
+    [titleInput, isStandardTextbook || isReferenceMaterial],
+    [authorInput, isStandardTextbook],
+    [publisherInput, isStandardTextbook || isReferenceMaterial],
+  ].forEach(([input, isVisible]) => {
+    if (!input) {
+      return;
+    }
+
+    input.closest("label")?.classList.toggle("hidden", !isVisible);
+    input.required = Boolean(isVisible);
+
+    if (!isVisible) {
+      input.value = "";
+    }
+  });
+}
+
+function renderBookAutocomplete() {
+  if (!state.bookCatalog.length) {
+    return;
+  }
+
+  const fields = [
+    ["bookTitleOptions", "title", [itemBookTitleInput, editItemBookTitleInput]],
+    ["bookAuthorOptions", "authors", [itemBookAuthorInput, editItemBookAuthorInput]],
+    ["bookPublisherOptions", "publisher", [itemBookPublisherInput, editItemBookPublisherInput]],
+  ];
+
+  fields.forEach(([listId, property, inputs]) => {
+    let dataList = document.querySelector(`#${listId}`);
+
+    if (!dataList) {
+      dataList = document.createElement("datalist");
+      dataList.id = listId;
+      document.body.append(dataList);
+    }
+
+    const values = [...new Set(state.bookCatalog.map((book) => String(book[property] || "").trim()).filter(Boolean))]
+      .sort((a, b) => a.localeCompare(b));
+    dataList.innerHTML = values.map((value) => `<option value="${escapeHtml(value)}"></option>`).join("");
+    inputs.filter(Boolean).forEach((input) => input.setAttribute("list", listId));
+  });
+}
+
+function applyBookCatalogMatch(prefix) {
+  const titleInput = prefix === "edit" ? editItemBookTitleInput : itemBookTitleInput;
+  const authorInput = prefix === "edit" ? editItemBookAuthorInput : itemBookAuthorInput;
+  const publisherInput = prefix === "edit" ? editItemBookPublisherInput : itemBookPublisherInput;
+  const selectedTitle = titleInput?.value.trim().toLowerCase();
+
+  if (!selectedTitle) {
+    return;
+  }
+
+  const matches = state.bookCatalog.filter((book) => book.title.trim().toLowerCase() === selectedTitle);
+  const authorMatch = matches.find((book) => book.authors?.trim());
+  const publisherMatch = matches.find((book) => book.publisher?.trim());
+
+  if (authorInput && !authorInput.value.trim() && authorMatch) {
+    authorInput.value = authorMatch.authors.trim();
+  }
+
+  if (publisherInput && !publisherInput.value.trim() && publisherMatch) {
+    publisherInput.value = publisherMatch.publisher.trim();
+  }
+}
+
+function updateEquipmentFieldsUI(prefix) {
+  const categoryInput = prefix === "edit" ? editItemCategoryInput : itemCategoryInput;
+  const inputs = prefix === "edit"
+    ? [editItemBrandNameInput, editItemModelNumberInput, editItemSerialNumberInput]
+    : [itemBrandNameInput, itemModelNumberInput, itemSerialNumberInput];
+  const isEquipmentCategory = ["50", "51", "53"].includes(categoryInput?.value);
+
+  inputs.forEach((input) => {
+    if (!input) {
+      return;
+    }
+
+    input.closest("label")?.classList.toggle("hidden", !isEquipmentCategory);
+    input.required = isEquipmentCategory;
+
+    if (!isEquipmentCategory) {
+      input.value = "";
+    }
+  });
+}
+
+function renderCategoryOptions() {
+  const options = [
+    '<option value="">Select category</option>',
+    ...Object.entries(PROPERTY_CLASSIFICATIONS).map(([code, classification]) =>
+      `<option value="${code}">${escapeHtml(classification.name)}</option>`),
+  ].join("");
+
+  [itemCategoryInput, editItemCategoryInput].filter(Boolean).forEach((input) => {
+    input.innerHTML = options;
+  });
+}
+
+function reorderAddInventoryFields() {
+  const grid = inventoryForm?.querySelector(".input-grid");
+  const orderedFieldIds = [
+    "itemSchoolName", "itemName", "itemDescription", "itemCategory", "itemSubcategory",
+    "itemBookTitle", "itemBookAuthor", "itemBookPublisher", "itemBrandName", "itemModelNumber", "itemSerialNumber",
+    "itemCategoryCode", "itemSubcategoryCode", "itemUacsCode", "itemTag",
+    "itemForm", "itemBundleItemsWrap", "itemAmount", "itemAssetType", "itemFundClusterCode", "itemUnit",
+    "itemAcquiredType", "itemAcquiredDetails", "itemReferenceNumber", "itemDateReceived",
+    "itemQuantity", "itemTotalAmount", "itemQuantityPerPropertyCard", "itemQuantityPerPhysicalCount",
+    "itemUsableCount", "itemNonUsableCount", "itemIcsNumberSource", "itemIcsNumberDistribute",
+    "itemTeacher", "itemAssignedDate", "itemLocation", "itemStatus", "itemNotes",
+  ];
+
+  if (!grid) {
+    return;
+  }
+
+  orderedFieldIds.forEach((id) => {
+    const element = document.querySelector(`#${id}`);
+    const field = element?.matches("label, .bundle-items-editor") ? element : element?.closest("label");
+    if (field) {
+      grid.append(field);
+    }
+  });
+}
+
+function toLegacyAcquiredType(acquisitionType) {
+  if (acquisitionType === "Purchase") {
+    return "Purchase";
+  }
+
+  if (acquisitionType === "Donation") {
+    return "Donated";
+  }
+
+  return "Not Applicable";
+}
+
+function normalizeAcquisitionType(acquiredType) {
+  return acquiredType === "Donated" ? "Donation" : acquiredType === "Purchase" ? "Purchase" : "Provision/Issuance";
+}
+
+function mapPropertyConditionToStatus(condition) {
+  if (condition === "For Maintenance/Repair") {
+    return "Maintenance";
+  }
+
+  if (condition === "Not Usable") {
+    return "Retired";
+  }
+
+  return "Available";
+}
+
+function getPropertyConditionFromStatus(status) {
+  if (status === "Maintenance") {
+    return "For Maintenance/Repair";
+  }
+
+  if (status === "Retired") {
+    return "Not Usable";
+  }
+
+  return "Working/Available";
+}
+
+function getSelectedCategoryName(prefix) {
+  const categoryInput = prefix === "edit" ? editItemCategoryInput : itemCategoryInput;
+  return PROPERTY_CLASSIFICATIONS[categoryInput?.value]?.name || "";
+}
+
+function getCategoryCodeForItem(item) {
+  if (item.categoryCode && PROPERTY_CLASSIFICATIONS[item.categoryCode]) {
+    return item.categoryCode;
+  }
+
+  return Object.entries(PROPERTY_CLASSIFICATIONS)
+    .find(([, classification]) => classification.name === item.category)?.[0] || "";
+}
+
+function updateSubcategoryUI(prefix, selectedSubcategory = "") {
+  const categoryInput = prefix === "edit" ? editItemCategoryInput : itemCategoryInput;
+  const subcategoryInput = prefix === "edit" ? editItemSubcategoryInput : itemSubcategoryInput;
+  const classification = PROPERTY_CLASSIFICATIONS[categoryInput?.value];
+
+  if (!subcategoryInput) {
+    return;
+  }
+
+  if (!classification) {
+    subcategoryInput.innerHTML = '<option value="">No mapped sub-categories</option>';
+    subcategoryInput.disabled = true;
+    subcategoryInput.required = false;
+    clearPropertyClassification(prefix);
+    return;
+  }
+
+  subcategoryInput.innerHTML = [
+    '<option value="">Select sub-category</option>',
+    ...classification.subcategories.map((subcategory) =>
+      `<option value="${escapeHtml(subcategory.name)}">${escapeHtml(subcategory.name)}</option>`),
+  ].join("");
+  subcategoryInput.disabled = false;
+  subcategoryInput.required = true;
+
+  if (classification.subcategories.some((subcategory) => subcategory.name === selectedSubcategory)) {
+    subcategoryInput.value = selectedSubcategory;
+  }
+
+  applyPropertyClassification(prefix);
+}
+
+function applyPropertyClassification(prefix) {
+  const idPrefix = prefix === "edit" ? "editItem" : "item";
+  const categoryInput = prefix === "edit" ? editItemCategoryInput : itemCategoryInput;
+  const subcategoryInput = prefix === "edit" ? editItemSubcategoryInput : itemSubcategoryInput;
+  const categoryCodeInput = document.querySelector(`#${idPrefix}CategoryCode`);
+  const subcategoryCodeInput = document.querySelector(`#${idPrefix}SubcategoryCode`);
+  const propertyNumberInput = document.querySelector(`#${idPrefix}Tag`);
+  const uacsInput = document.querySelector(`#${idPrefix}UacsCode`);
+  const classification = PROPERTY_CLASSIFICATIONS[categoryInput?.value];
+  const subcategory = classification?.subcategories.find((entry) => entry.name === subcategoryInput?.value);
+
+  const effectiveCategoryCode = subcategory?.categoryCode || categoryInput?.value || "";
+  categoryCodeInput.value = effectiveCategoryCode;
+  subcategoryCodeInput.value = subcategory?.code || "";
+
+  if (!classification || !subcategory) {
+    return;
+  }
+
+  propertyNumberInput.value = `${effectiveCategoryCode}-${subcategory.code}-`;
+  uacsInput.value = subcategory.uacsCode;
+}
+
+function clearPropertyClassification(prefix) {
+  const idPrefix = prefix === "edit" ? "editItem" : "item";
+  document.querySelector(`#${idPrefix}CategoryCode`).value = "";
+  document.querySelector(`#${idPrefix}SubcategoryCode`).value = "";
+}
+
+function updateSchoolFieldVisibility() {
+  const isAdmin = state.auth.role === "admin";
+
+  [
+    [document.querySelector("#itemSchoolNameWrap"), itemSchoolNameInput],
+    [editItemSchoolNameInput?.closest("label"), editItemSchoolNameInput],
+  ].forEach(([wrap, input]) => {
+    if (!wrap || !input) {
+      return;
+    }
+
+    wrap.classList.toggle("hidden", !isAdmin);
+  });
+}
+
 function updateAcquiredDetailsUI(prefix) {
   const typeSelect = prefix === "edit" ? editItemAcquiredType : itemAcquiredType;
   const wrap = prefix === "edit" ? editItemAcquiredDetailsWrap : itemAcquiredDetailsWrap;
@@ -2080,7 +3002,7 @@ function updateAcquiredDetailsUI(prefix) {
     return;
   }
 
-  if (selected === "Donated") {
+  if (selected === "Donation") {
     wrap.hidden = false;
     label.textContent = "Donated By";
     input.placeholder = "Enter donor name";
@@ -2109,7 +3031,7 @@ function getAcquiredDetailsText(type, details) {
     return `Purchased from: ${details}`;
   }
 
-  if (type === "Donated") {
+  if (type === "Donation" || type === "Donated") {
     return `Donated by: ${details}`;
   }
 
@@ -2235,6 +3157,10 @@ function escapeHtml(value) {
     .replaceAll("&", "&amp;")
     .replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;");
+}
+
+function escapeHtmlAttribute(value) {
+  return escapeHtml(value).replaceAll('"', "&quot;").replaceAll("'", "&#39;");
 }
 
 function escapeCsvValue(value) {

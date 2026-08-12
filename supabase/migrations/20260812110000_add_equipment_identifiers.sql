@@ -1,0 +1,3 @@
+ALTER TABLE inventory_items
+  ADD COLUMN IF NOT EXISTS model_number TEXT NOT NULL DEFAULT '',
+  ADD COLUMN IF NOT EXISTS serial_number TEXT NOT NULL DEFAULT '';

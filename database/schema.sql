@@ -27,11 +27,19 @@ CREATE TABLE IF NOT EXISTS teachers (
 CREATE TABLE IF NOT EXISTS inventory_items (
   id TEXT PRIMARY KEY,
   name TEXT NOT NULL,
+  item_form TEXT NOT NULL DEFAULT 'Single' CHECK (item_form IN ('Single', 'Bundle/Package')),
+  bundle_items TEXT NOT NULL DEFAULT '',
   category TEXT NOT NULL,
+  subcategory TEXT NOT NULL DEFAULT '',
+  category_code TEXT NOT NULL DEFAULT '',
+  subcategory_code TEXT NOT NULL DEFAULT '',
   description TEXT NOT NULL DEFAULT '',
   date_received TEXT,
   brand_name TEXT DEFAULT '',
+  model_number TEXT DEFAULT '',
+  serial_number TEXT DEFAULT '',
   book_title TEXT DEFAULT '',
+  book_author TEXT DEFAULT '',
   book_publisher TEXT DEFAULT '',
   school_name TEXT NOT NULL DEFAULT 'Landahan Elementary School',
   asset_tag TEXT NOT NULL UNIQUE,
@@ -49,7 +57,9 @@ CREATE TABLE IF NOT EXISTS inventory_items (
   reference_number TEXT DEFAULT '',
   asset_type TEXT NOT NULL CHECK (asset_type IN ('PPE', 'Semi-Expandable', 'Not Expandable')),
   acquired_type TEXT NOT NULL DEFAULT 'Not Applicable' CHECK (acquired_type IN ('Purchase', 'Donated', 'Not Applicable')),
+  acquisition_type TEXT NOT NULL DEFAULT 'Purchase',
   acquired_details TEXT DEFAULT '',
+  property_condition TEXT NOT NULL DEFAULT 'Working/Available',
   location TEXT NOT NULL,
   status TEXT NOT NULL CHECK (status IN ('Available', 'Assigned', 'Maintenance', 'Retired')),
   assigned_teacher_id TEXT REFERENCES teachers(id) ON DELETE SET NULL,
@@ -70,6 +80,19 @@ CREATE TABLE IF NOT EXISTS stock_movements (
   created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS book_catalog (
+  title TEXT NOT NULL,
+  grade_levels TEXT NOT NULL DEFAULT '',
+  type TEXT NOT NULL DEFAULT '',
+  authors TEXT NOT NULL DEFAULT '',
+  subjects TEXT NOT NULL DEFAULT '',
+  publisher TEXT NOT NULL DEFAULT '',
+  volume TEXT NOT NULL DEFAULT '',
+  copyrightyear TEXT NOT NULL DEFAULT '',
+  pages TEXT NOT NULL DEFAULT '',
+  isbn TEXT NOT NULL DEFAULT ''
+);
+
 CREATE TABLE IF NOT EXISTS app_users (
   id TEXT PRIMARY KEY,
   username TEXT NOT NULL UNIQUE,
@@ -85,10 +108,14 @@ SELECT
   i.id,
   i.name,
   i.category,
+  i.subcategory,
+  i.category_code,
+  i.subcategory_code,
   i.description,
   i.date_received,
   i.brand_name,
   i.book_title,
+  i.book_author,
   i.book_publisher,
   i.school_name,
   i.asset_tag,
@@ -118,6 +145,8 @@ SELECT
   t.suffix_name,
   t.department AS teacher_department,
   t.current_position AS teacher_position,
-  t.email AS teacher_email
+  t.email AS teacher_email,
+  i.item_form,
+  i.bundle_items
 FROM inventory_items i
 LEFT JOIN teachers t ON t.id = i.assigned_teacher_id;

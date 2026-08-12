@@ -46,42 +46,49 @@
         </div>
         <form id="inventoryForm" class="stack-form">
           <div class="input-grid">
-            <label>
+            <label id="itemSchoolNameWrap">
+              <span>Name of School</span>
+              <select id="itemSchoolName" required>
+                <option value="">Select school</option>
+              </select>
+            </label>
+            <label class="full-width">
               <span>Item Name</span>
               <input type="text" id="itemName" placeholder="e.g. Projector" required>
             </label>
             <label>
+              <span>Item Type</span>
+              <select id="itemForm" required>
+                <option value="Single">Single</option>
+                <option value="Bundle/Package">Bundle/Package</option>
+              </select>
+            </label>
+            <div id="itemBundleItemsWrap" class="full-width bundle-items-editor hidden">
+              <span class="field-label">Items Included in Bundle/Package</span>
+              <div id="itemBundleItemLines" class="bundle-item-lines"></div>
+              <button id="addBundleItemLineBtn" class="ghost-btn" type="button">Add Another Item</button>
+            </div>
+            <label>
               <span>Category</span>
               <select id="itemCategory" required>
                 <option value="">Select category</option>
-                <option value="Appliances">Appliances</option>
-                <option value="Audio-Visual Equipment">Audio-Visual Equipment</option>
-                <option value="Building Improvements">Building Improvements</option>
-                <option value="Buildings">Buildings</option>
-                <option value="Classroom Furniture">Classroom Furniture</option>
-                <option value="Cleaning Supplies">Cleaning Supplies</option>
-                <option value="DRRM Equipment">DRRM Equipment</option>
-                <option value="Electrical Supplies">Electrical Supplies</option>
-                <option value="Fixtures">Fixtures</option>
-                <option value="ICT Equipment">ICT Equipment</option>
-                <option value="Instructional Materials">Instructional Materials</option>
-                <option value="Kitchen Equipment">Kitchen Equipment</option>
-                <option value="Laboratory Equipment">Laboratory Equipment</option>
-                <option value="Land">Land</option>
-                <option value="Land Improvements">Land Improvements</option>
-                <option value="Library Books">Library Books</option>
-                <option value="Medical Supplies">Medical Supplies</option>
-                <option value="Office Furniture">Office Furniture</option>
-                <option value="Office Supplies">Office Supplies</option>
-                <option value="Other School Property">Other School Property</option>
-                <option value="School Supplies">School Supplies</option>
-                <option value="Science Equipment">Science Equipment</option>
-                <option value="Sports Equipment">Sports Equipment</option>
-                <option value="Textbooks">Textbooks</option>
-                <option value="Tools and Equipment">Tools and Equipment</option>
+              </select>
+            </label>
+            <label id="itemSubcategoryWrap">
+              <span>Sub-Category</span>
+              <select id="itemSubcategory" disabled required>
+                <option value="">Select a category first</option>
               </select>
             </label>
             <label>
+              <span>Category Code</span>
+              <input type="text" id="itemCategoryCode" readonly>
+            </label>
+            <label>
+              <span>Sub-Category Code</span>
+              <input type="text" id="itemSubcategoryCode" readonly>
+            </label>
+            <label class="full-width">
               <span>Description</span>
               <input type="text" id="itemDescription" placeholder="e.g. Epson projector with remote" required>
             </label>
@@ -89,21 +96,29 @@
               <span>Date Received</span>
               <input type="date" id="itemDateReceived">
             </label>
-            <label>
+            <label id="itemBrandNameWrap" class="equipment-field hidden">
               <span>Brand Name</span>
               <input type="text" id="itemBrandName" placeholder="e.g. Epson">
             </label>
-            <label>
+            <label id="itemModelNumberWrap" class="equipment-field hidden">
+              <span>Model</span>
+              <input type="text" id="itemModelNumber" placeholder="e.g. EB-X06">
+            </label>
+            <label id="itemSerialNumberWrap" class="equipment-field hidden">
+              <span>Serial Number</span>
+              <input type="text" id="itemSerialNumber" placeholder="Enter serial number">
+            </label>
+            <label id="itemBookTitleWrap" class="book-field hidden">
               <span>Book Title</span>
               <input type="text" id="itemBookTitle" placeholder="e.g. Salindawa">
             </label>
-            <label>
+            <label id="itemBookAuthorWrap" class="book-field hidden">
+              <span>Book Author</span>
+              <input type="text" id="itemBookAuthor" placeholder="e.g. Juan Dela Cruz">
+            </label>
+            <label id="itemBookPublisherWrap" class="book-field hidden">
               <span>Book Publisher</span>
               <input type="text" id="itemBookPublisher" placeholder="e.g. DepEd Bureau of Learning Resources">
-            </label>
-          <label>
-            <span>School Name</span>
-              <input type="text" id="itemSchoolName" list="schoolNameOptions" autocomplete="off" required>
             </label>
             <label>
               <span>Property Number</span>
@@ -122,19 +137,26 @@
               <input type="number" id="itemQuantityPerPhysicalCount" min="0" value="0" required>
             </label>
             <label>
-              <span>No. of Usable</span>
+              <span>Number of Usable</span>
               <input type="number" id="itemUsableCount" min="0" value="0" required>
             </label>
             <label>
-              <span>No. of Non-usable</span>
+              <span>Number of Non-Usable</span>
               <input type="number" id="itemNonUsableCount" min="0" value="0" required>
             </label>
             <label>
               <span>Unit of Measurement</span>
-              <input type="text" id="itemUnit" placeholder="e.g. piece, set, box" required>
+              <select id="itemUnit" required>
+                <option value="">Select unit</option>
+                <option>Piece (PC)</option><option>Copy (Copy)</option><option>Unit (UNIT)</option>
+                <option>Set (SET)</option><option>Pair (PR)</option><option>Pack (PACK)</option>
+                <option>Box (BOX)</option><option>Dozen (DOZ)</option><option>Ream (REAM)</option>
+                <option>Roll (ROLL)</option><option>Meter (M)</option><option>Kilogram (KG)</option>
+                <option>Liter (L)</option><option>Lot (LOT)</option>
+              </select>
             </label>
             <label>
-              <span>Price per Item</span>
+              <span>Price</span>
               <input type="number" id="itemAmount" min="0" step="0.01" placeholder="e.g. 15000.00" required>
             </label>
             <label>
@@ -143,26 +165,37 @@
             </label>
             <label>
               <span>UACS Code</span>
-              <input type="text" id="itemUacsCode" placeholder="e.g. 10605030" required>
+              <input type="text" id="itemUacsCode" placeholder="Select a sub-category" readonly required>
             </label>
             <label>
-              <span>Fund Cluster Code</span>
-              <input type="text" id="itemFundClusterCode" placeholder="e.g. 101" required>
+              <span>Fund Cluster</span>
+              <select id="itemFundClusterCode" required>
+                <option value="">Select fund cluster</option>
+                <option value="01">01 - Regular Agency Fund</option>
+                <option value="02">02 - Special Purpose Fund</option>
+                <option value="03">03 - Special Account - Locally Funded / Domestic Grants</option>
+                <option value="04">04 - Special Account - Foreign Assisted / Foreign Grants</option>
+                <option value="05">05 - Internally Generated Funds</option>
+                <option value="06">06 - Business Related Funds</option>
+                <option value="07">07 - Trust Receipts</option>
+                <option value="08">08 - Trust Fund</option>
+                <option value="09">09 - Custodial Funds</option>
+              </select>
             </label>
             <label>
-              <span>ICS Number (Source)</span>
+              <span>ICS (Source)</span>
               <input type="text" id="itemIcsNumberSource" placeholder="e.g. ICS-2026-001">
             </label>
             <label>
-              <span>ICS Number (Distribute)</span>
+              <span>ICS (Assigned/Distributed)</span>
               <input type="text" id="itemIcsNumberDistribute" placeholder="e.g. ICS-DIST-2026-001">
             </label>
-            <label class="full-width">
+            <label>
               <span>Reference Number (OR Number/Purchased Details / Delivery Receipt)</span>
               <input type="text" id="itemReferenceNumber" placeholder="e.g. OR-2026-001 / DR-2026-014">
             </label>
             <label>
-              <span>Type of Item</span>
+              <span>Property Classification</span>
               <select id="itemAssetType" required>
                 <option value="Not Expandable">Consumables/Non Property Items</option>
                 <option value="PPE">Property, Plant, and Equipment (PPE)</option>
@@ -170,11 +203,13 @@
               </select>
             </label>
             <label>
-              <span>Acquired</span>
+              <span>Acquisition Type</span>
               <select id="itemAcquiredType" required>
-                <option value="Donated">Donated</option>
-                <option value="Not Applicable">Not Applicable</option>
-                <option value="Purchase">Purchase</option>
+                <option value="Purchase">Purchase</option><option value="Donation">Donation</option>
+                <option value="Transfer">Transfer</option><option value="Provision/Issuance">Provision/Issuance</option>
+                <option value="Construction">Construction</option><option value="Fabricated">Fabricated</option>
+                <option value="LGU/Barangay Assistance">LGU/Barangay Assistance</option>
+                <option value="Grant/Project">Grant/Project</option>
               </select>
             </label>
             <label id="itemAcquiredDetailsWrap">
@@ -186,12 +221,11 @@
               <input type="text" id="itemLocation" placeholder="e.g. Room 204" required>
             </label>
             <label>
-              <span>Status</span>
+              <span>Property Status</span>
               <select id="itemStatus" required>
-                <option value="Assigned">Assigned</option>
-                <option value="Maintenance">Maintenance</option>
-                <option value="Available">Available</option>
-                <option value="Retired">For Repair / Not Working</option>
+                <option value="Working/Available">Working/Available</option>
+                <option value="For Maintenance/Repair">For Maintenance/Repair</option>
+                <option value="Not Usable">Not Usable</option>
               </select>
             </label>
             <label>
@@ -201,7 +235,7 @@
               </select>
             </label>
             <label>
-              <span>Date Assigned</span>
+              <span>Date Assigned to the Personnel</span>
               <input type="date" id="itemAssignedDate">
             </label>
             <label class="full-width">
@@ -233,35 +267,36 @@
             <input type="text" id="editItemName" required>
           </label>
           <label>
+            <span>Item Type</span>
+            <select id="editItemForm" required>
+              <option value="Single">Single</option>
+              <option value="Bundle/Package">Bundle/Package</option>
+            </select>
+          </label>
+          <div id="editItemBundleItemsWrap" class="full-width bundle-items-editor hidden">
+            <span class="field-label">Items Included in Bundle/Package</span>
+            <div id="editItemBundleItemLines" class="bundle-item-lines"></div>
+            <button id="editAddBundleItemLineBtn" class="ghost-btn" type="button">Add Another Item</button>
+          </div>
+          <label>
             <span>Category</span>
             <select id="editItemCategory" required>
               <option value="">Select category</option>
-              <option value="Appliances">Appliances</option>
-              <option value="Audio-Visual Equipment">Audio-Visual Equipment</option>
-              <option value="Building Improvements">Building Improvements</option>
-              <option value="Buildings">Buildings</option>
-              <option value="Classroom Furniture">Classroom Furniture</option>
-              <option value="Cleaning Supplies">Cleaning Supplies</option>
-              <option value="DRRM Equipment">DRRM Equipment</option>
-              <option value="Electrical Supplies">Electrical Supplies</option>
-              <option value="Fixtures">Fixtures</option>
-              <option value="ICT Equipment">ICT Equipment</option>
-              <option value="Instructional Materials">Instructional Materials</option>
-              <option value="Kitchen Equipment">Kitchen Equipment</option>
-              <option value="Laboratory Equipment">Laboratory Equipment</option>
-              <option value="Land">Land</option>
-              <option value="Land Improvements">Land Improvements</option>
-              <option value="Library Books">Library Books</option>
-              <option value="Medical Supplies">Medical Supplies</option>
-              <option value="Office Furniture">Office Furniture</option>
-              <option value="Office Supplies">Office Supplies</option>
-              <option value="Other School Property">Other School Property</option>
-              <option value="School Supplies">School Supplies</option>
-              <option value="Science Equipment">Science Equipment</option>
-              <option value="Sports Equipment">Sports Equipment</option>
-              <option value="Textbooks">Textbooks</option>
-              <option value="Tools and Equipment">Tools and Equipment</option>
             </select>
+          </label>
+          <label>
+            <span>Sub-Category</span>
+            <select id="editItemSubcategory" disabled required>
+              <option value="">Select a category first</option>
+            </select>
+          </label>
+          <label>
+            <span>Category Code</span>
+            <input type="text" id="editItemCategoryCode" readonly>
+          </label>
+          <label>
+            <span>Sub-Category Code</span>
+            <input type="text" id="editItemSubcategoryCode" readonly>
           </label>
           <label>
             <span>Description</span>
@@ -271,21 +306,35 @@
             <span>Date Received</span>
             <input type="date" id="editItemDateReceived">
           </label>
-          <label>
+          <label id="editItemBrandNameWrap" class="equipment-field hidden">
             <span>Brand Name</span>
             <input type="text" id="editItemBrandName">
           </label>
-          <label>
+          <label id="editItemModelNumberWrap" class="equipment-field hidden">
+            <span>Model</span>
+            <input type="text" id="editItemModelNumber">
+          </label>
+          <label id="editItemSerialNumberWrap" class="equipment-field hidden">
+            <span>Serial Number</span>
+            <input type="text" id="editItemSerialNumber">
+          </label>
+          <label id="editItemBookTitleWrap" class="book-field hidden">
             <span>Book Title</span>
             <input type="text" id="editItemBookTitle">
           </label>
-          <label>
+          <label id="editItemBookAuthorWrap" class="book-field hidden">
+            <span>Book Author</span>
+            <input type="text" id="editItemBookAuthor">
+          </label>
+          <label id="editItemBookPublisherWrap" class="book-field hidden">
             <span>Book Publisher</span>
             <input type="text" id="editItemBookPublisher">
           </label>
           <label>
-            <span>School Name</span>
-            <input type="text" id="editItemSchoolName" list="schoolNameOptions" autocomplete="off" required>
+            <span>Name of School</span>
+            <select id="editItemSchoolName" required>
+              <option value="">Select school</option>
+            </select>
           </label>
           <label>
             <span>Property Number</span>
@@ -313,7 +362,13 @@
           </label>
           <label>
             <span>Unit of Measurement</span>
-            <input type="text" id="editItemUnit" required>
+            <select id="editItemUnit" required>
+              <option value="">Select unit</option><option>Piece (PC)</option><option>Copy (Copy)</option>
+              <option>Unit (UNIT)</option><option>Set (SET)</option><option>Pair (PR)</option>
+              <option>Pack (PACK)</option><option>Box (BOX)</option><option>Dozen (DOZ)</option>
+              <option>Ream (REAM)</option><option>Roll (ROLL)</option><option>Meter (M)</option>
+              <option>Kilogram (KG)</option><option>Liter (L)</option><option>Lot (LOT)</option>
+            </select>
           </label>
           <label>
             <span>Price per Item</span>
@@ -325,11 +380,19 @@
           </label>
           <label>
             <span>UACS Code</span>
-            <input type="text" id="editItemUacsCode" required>
+            <input type="text" id="editItemUacsCode" readonly required>
           </label>
           <label>
-            <span>Fund Cluster Code</span>
-            <input type="text" id="editItemFundClusterCode" required>
+            <span>Fund Cluster</span>
+            <select id="editItemFundClusterCode" required>
+              <option value="">Select fund cluster</option>
+              <option value="01">01 - Regular Agency Fund</option><option value="02">02 - Special Purpose Fund</option>
+              <option value="03">03 - Special Account - Locally Funded / Domestic Grants</option>
+              <option value="04">04 - Special Account - Foreign Assisted / Foreign Grants</option>
+              <option value="05">05 - Internally Generated Funds</option><option value="06">06 - Business Related Funds</option>
+              <option value="07">07 - Trust Receipts</option><option value="08">08 - Trust Fund</option>
+              <option value="09">09 - Custodial Funds</option>
+            </select>
           </label>
           <label>
             <span>ICS Number (Source)</span>
@@ -344,7 +407,7 @@
             <input type="text" id="editItemReferenceNumber">
           </label>
           <label>
-            <span>Type of Item</span>
+            <span>Property Classification</span>
             <select id="editItemAssetType" required>
               <option value="Not Expandable">Consumables/Non Property Items</option>
               <option value="PPE">Property, Plant, and Equipment (PPE)</option>
@@ -352,11 +415,12 @@
             </select>
           </label>
           <label>
-            <span>Acquired</span>
+            <span>Acquisition Type</span>
             <select id="editItemAcquiredType" required>
-              <option value="Donated">Donated</option>
-              <option value="Not Applicable">Not Applicable</option>
-              <option value="Purchase">Purchase</option>
+              <option value="Purchase">Purchase</option><option value="Donation">Donation</option>
+              <option value="Transfer">Transfer</option><option value="Provision/Issuance">Provision/Issuance</option>
+              <option value="Construction">Construction</option><option value="Fabricated">Fabricated</option>
+              <option value="LGU/Barangay Assistance">LGU/Barangay Assistance</option><option value="Grant/Project">Grant/Project</option>
             </select>
           </label>
           <label id="editItemAcquiredDetailsWrap">
@@ -368,12 +432,11 @@
             <input type="text" id="editItemLocation" required>
           </label>
           <label>
-            <span>Status</span>
+            <span>Property Status</span>
             <select id="editItemStatus" required>
-              <option value="Assigned">Assigned</option>
-              <option value="Maintenance">Maintenance</option>
-              <option value="Available">Available</option>
-              <option value="Retired">For Repair / Not Working</option>
+              <option value="Working/Available">Working/Available</option>
+              <option value="For Maintenance/Repair">For Maintenance/Repair</option>
+              <option value="Not Usable">Not Usable</option>
             </select>
           </label>
           <label>
