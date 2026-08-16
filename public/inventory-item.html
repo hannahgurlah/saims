@@ -47,12 +47,20 @@
         </div>
         <form id="inventoryForm" class="stack-form">
           <div class="input-grid">
-            <label id="itemSchoolNameWrap">
+            <label>
+              <span>Type of Office</span>
+              <select id="itemOfficeType" required>
+                <option value="">Select type of office</option><option value="OSDS">Office of the Schools Division Superintendent (OSDS)</option><option value="SGOD">School Governance and Operations Division (SGOD)</option><option value="CID">Curriculum and Instruction Division (CID)</option><option value="HS">High School (HS)</option><option value="ES">Elementary School (ES)</option>
+              </select>
+            </label>
+            <label><span>Location Code</span><input type="text" id="itemLocationCode" readonly required></label>
+            <label id="itemSchoolNameWrap" class="hidden" hidden>
               <span>Name of School</span>
               <select id="itemSchoolName" required>
                 <option value="">Select school</option>
               </select>
             </label>
+            <label id="itemSchoolCodeWrap" class="hidden"><span>School Code</span><input type="text" id="itemSchoolCode" readonly></label>
             <label class="full-width">
               <span>Item Name</span>
               <input type="text" id="itemName" placeholder="e.g. Projector" required>
@@ -94,6 +102,10 @@
               <input type="text" id="itemDescription" placeholder="e.g. Epson projector with remote" required>
             </label>
             <label>
+              <span>Year Acquired</span>
+              <input type="number" id="itemYearAcquired" min="1900" max="2100" placeholder="e.g. 2026" required>
+            </label>
+            <label>
               <span>Date Received</span>
               <input type="date" id="itemDateReceived">
             </label>
@@ -111,7 +123,25 @@
             </label>
             <label id="itemBookTitleWrap" class="book-field hidden">
               <span>Book Title</span>
-              <input type="text" id="itemBookTitle" placeholder="e.g. Salindawa">
+              <input type="text" id="itemBookTitle" list="bookTitleOptions" autocomplete="off" placeholder="Start typing a book title">
+            </label>
+            <label id="itemBookTypeWrap" class="book-field hidden">
+              <span>Book Type</span>
+              <select id="itemBookType">
+                <option value="">Select book type</option>
+                <option value="Standard Textbook">Standard Textbook</option>
+                <option value="Teachers Manual">Teachers Manual</option>
+              </select>
+            </label>
+            <label id="itemGradeLevelWrap" class="book-field hidden">
+              <span>Grade Level</span>
+              <select id="itemGradeLevel">
+                <option value="">Select grade level</option><option>Kinder</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option>
+              </select>
+            </label>
+            <label id="itemSubjectAreaWrap" class="book-field hidden">
+              <span>Subject Area</span>
+              <select id="itemSubjectArea"><option value="">Select subject area</option></select>
             </label>
             <label id="itemBookAuthorWrap" class="book-field hidden">
               <span>Book Author</span>
@@ -152,7 +182,7 @@
                 <option>Piece (PC)</option><option>Copy (Copy)</option><option>Unit (UNIT)</option>
                 <option>Set (SET)</option><option>Pair (PR)</option><option>Pack (PACK)</option>
                 <option>Box (BOX)</option><option>Dozen (DOZ)</option><option>Ream (REAM)</option>
-                <option>Roll (ROLL)</option><option>Meter (M)</option><option>Kilogram (KG)</option>
+                <option>Roll (ROLL)</option><option>Meter (M)</option><option>Square meter (SQ M)</option><option>Kilogram (KG)</option>
                 <option>Liter (L)</option><option>Lot (LOT)</option>
               </select>
             </label>
@@ -304,6 +334,20 @@
             <input type="text" id="editItemDescription" required>
           </label>
           <label>
+            <span>Type of Office</span>
+            <select id="editItemOfficeType" required>
+              <option value="">Select type of office</option><option value="OSDS">Office of the Schools Division Superintendent (OSDS)</option><option value="SGOD">School Governance and Operations Division (SGOD)</option><option value="CID">Curriculum and Instruction Division (CID)</option><option value="HS">High School (HS)</option><option value="ES">Elementary School (ES)</option>
+            </select>
+          </label>
+          <label><span>Location Code</span><input type="text" id="editItemLocationCode" readonly required></label>
+          <label id="editItemSchoolNameWrap" class="hidden" hidden>
+            <span>Name of School</span><select id="editItemSchoolName" required><option value="">Select school</option></select>
+          </label>
+          <label id="editItemSchoolCodeWrap" class="hidden"><span>School Code</span><input type="text" id="editItemSchoolCode" readonly></label>
+          <label>
+            <span>Year Acquired</span><input type="number" id="editItemYearAcquired" min="1900" max="2100" required>
+          </label>
+          <label>
             <span>Date Received</span>
             <input type="date" id="editItemDateReceived">
           </label>
@@ -321,7 +365,25 @@
           </label>
           <label id="editItemBookTitleWrap" class="book-field hidden">
             <span>Book Title</span>
-            <input type="text" id="editItemBookTitle">
+            <input type="text" id="editItemBookTitle" list="bookTitleOptions" autocomplete="off">
+          </label>
+          <label id="editItemBookTypeWrap" class="book-field hidden">
+            <span>Book Type</span>
+            <select id="editItemBookType">
+              <option value="">Select book type</option>
+              <option value="Standard Textbook">Standard Textbook</option>
+              <option value="Teachers Manual">Teachers Manual</option>
+            </select>
+          </label>
+          <label id="editItemGradeLevelWrap" class="book-field hidden">
+            <span>Grade Level</span>
+            <select id="editItemGradeLevel">
+              <option value="">Select grade level</option><option>Kinder</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option>
+            </select>
+          </label>
+          <label id="editItemSubjectAreaWrap" class="book-field hidden">
+            <span>Subject Area</span>
+            <select id="editItemSubjectArea"><option value="">Select subject area</option></select>
           </label>
           <label id="editItemBookAuthorWrap" class="book-field hidden">
             <span>Book Author</span>
@@ -330,12 +392,6 @@
           <label id="editItemBookPublisherWrap" class="book-field hidden">
             <span>Book Publisher</span>
             <input type="text" id="editItemBookPublisher">
-          </label>
-          <label>
-            <span>Name of School</span>
-            <select id="editItemSchoolName" required>
-              <option value="">Select school</option>
-            </select>
           </label>
           <label>
             <span>Property Number</span>
@@ -367,7 +423,7 @@
               <option value="">Select unit</option><option>Piece (PC)</option><option>Copy (Copy)</option>
               <option>Unit (UNIT)</option><option>Set (SET)</option><option>Pair (PR)</option>
               <option>Pack (PACK)</option><option>Box (BOX)</option><option>Dozen (DOZ)</option>
-              <option>Ream (REAM)</option><option>Roll (ROLL)</option><option>Meter (M)</option>
+              <option>Ream (REAM)</option><option>Roll (ROLL)</option><option>Meter (M)</option><option>Square meter (SQ M)</option>
               <option>Kilogram (KG)</option><option>Liter (L)</option><option>Lot (LOT)</option>
             </select>
           </label>
@@ -460,6 +516,7 @@
     </div>
   </div>
 
+  <datalist id="bookTitleOptions"></datalist>
   <script src="main.js"></script>
 </body>
 

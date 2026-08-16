@@ -184,11 +184,44 @@ const PROPERTY_CLASSIFICATIONS = {
   },
 };
 
+const LOCATION_CODES = { OSDS: "01", SGOD: "02", CID: "03", ES: "04", HS: "05" };
+const ELEMENTARY_SCHOOL_CODES = {
+  "Apid Elementary School": "01", "Awihao Elementary School": "02", "Bagakay Elementary School": "03", "Bato Elementary School": "04", "Biga Elementary School": "05", "Bulongan Elementary School": "06", "Bunga Elementary School": "07", "Buswang Elementary School": "08", "Calibasan Elementary School": "09", "Calong-Calong Elementary School": "10", "Cambang-ug Elementary School": "11", "Canlumampao Elementary School": "12", "Cantabaco Elementary School": "13", "Capt. Claudio Elementary School": "14", "Carmen Elementary School": "15", "Don Andres Soriano Elementary School": "16", "Dumlog Elementary School": "17", "Fulgencio Dolino Elementary School": "18", "Gen. Pantaleon del Rosario Elementary School": "19", "Himatugan Elementary School": "20", "Ibo Elementary School": "21", "Jacinta Larosa Elementary School": "22", "Landahan Elementary School": "23", "Loay Elementary School": "24", "Lower Campo 8 Elementary School": "25", "Lower Tubod Elementary School": "26", "Luas Elementary School": "27", "Lubo Elementary School": "28", "Magdugo Elementary School": "29", "Mainggit Elementary School": "30", "Makatol Elementary School": "31", "Malubog Elementary School": "32", "Matab-ang Elementary School": "33", "Media Once Elementary School": "34", "Minolos Elementary School": "35", "New Bucao Elementary School": "36", "North City Central School": "37", "Old Bucao Elementary School": "38", "Pandongbato Elementary School": "39", "Pangamihan Elementary School": "40", "Poog Elementary School": "41", "Putingbato Elementary School": "42", "Sagay Elementary School": "43", "Sam-ang Elementary School": "44", "Sangi Elementary School": "45", "South City Central School": "46", "Subayon Elementary School": "47", "Talavera Elementary School": "48", "Tongkay Elementary School": "49", "Upper Campo 8 Elementary School": "50",
+};
+const HIGH_SCHOOL_CODES = {
+  "Awihao National High School": "01", "Bato National High School": "02", "Bunga National High School": "03", "Cantabaco National High School": "04", "Don Andres Soriano National High School": "05", "Gen. Climaco National High School": "06", "Gen. Pantaleon del Rosario National High School": "07", "Luray II Barangay High School": "08", "Magdugo National High School": "09", "Marcelo and Anunciacion Libre Dolino National High School": "10", "Matab-ang National High School": "11", "Media Once National High School": "12", "Pangamihan National High School": "13", "Pres. Sergio Osmeña Sr. National High School": "14", "Primo and Teresa Cabonita Sigue National High School": "15", "Toledo City Science High School": "16", "Toledo National Vocational School": "17",
+};
+
 const navLinks = document.querySelector(".nav-links");
+
+const navIconPaths = {
+  "dashboard.html": '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',
+  "teachers.html": '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>',
+  "inventory-item.html": '<path d="m21 8-9-5-9 5 9 5 9-5Z"/><path d="m3 8 9 5 9-5M3 12l9 5 9-5M3 16l9 5 9-5"/>',
+  "inventory-list.html": '<path d="M9 6h11M9 12h11M9 18h11"/><path d="M4 6h.01M4 12h.01M4 18h.01"/>',
+  "stock-card.html": '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 8h10M7 12h6M7 16h8"/>',
+  "reports.html": '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
+  "settings.html": '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.83 2.83-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.1V21h-4v-.09A1.7 1.7 0 0 0 8.6 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06-2.83-2.83.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.1-.4H3v-4h.09A1.7 1.7 0 0 0 4.6 8.6a1.7 1.7 0 0 0-.34-1.88l-.06-.06 2.83-2.83.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.1V3h4v.09A1.7 1.7 0 0 0 15.4 4.6a1.7 1.7 0 0 0 1.88-.34l.06-.06 2.83 2.83-.06.06A1.7 1.7 0 0 0 19.4 9c.14.37.36.71.65.98.3.27.68.42 1.08.42H21v4h-.09A1.7 1.7 0 0 0 19.4 15Z"/>',
+  "profile.html": '<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
+};
+
+function createNavIcon(paths) {
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("class", "nav-icon");
+  svg.setAttribute("viewBox", "0 0 24 24");
+  svg.setAttribute("aria-hidden", "true");
+  svg.setAttribute("focusable", "false");
+  svg.innerHTML = paths;
+  return svg;
+}
 
 if (navLinks) {
   const currentPage = window.location.pathname.split("/").pop() || "index.html";
   navLinks.querySelectorAll("a").forEach((link) => {
+    const iconPaths = navIconPaths[link.getAttribute("href")];
+    if (iconPaths && !link.querySelector(".nav-icon")) {
+      link.prepend(createNavIcon(iconPaths));
+    }
     link.classList.toggle("active", link.getAttribute("href") === currentPage);
   });
 }
@@ -210,6 +243,9 @@ const closeTeacherModalBtn = document.querySelector("#closeTeacherModalBtn");
 const inventoryForm = document.querySelector("#inventoryForm");
 const itemTeacher = document.querySelector("#itemTeacher");
 const itemSchoolNameInput = document.querySelector("#itemSchoolName");
+const itemOfficeTypeInput = document.querySelector("#itemOfficeType");
+const itemLocationCodeInput = document.querySelector("#itemLocationCode");
+const itemSchoolCodeInput = document.querySelector("#itemSchoolCode");
 const itemQuantityInput = document.querySelector("#itemQuantity");
 const itemQuantityPerPropertyCardInput = document.querySelector("#itemQuantityPerPropertyCard");
 const itemQuantityPerPhysicalCountInput = document.querySelector("#itemQuantityPerPhysicalCount");
@@ -224,6 +260,9 @@ const itemAcquiredDetailsInput = document.querySelector("#itemAcquiredDetails");
 const itemCategoryInput = document.querySelector("#itemCategory");
 const itemSubcategoryInput = document.querySelector("#itemSubcategory");
 const itemBookTitleInput = document.querySelector("#itemBookTitle");
+const itemBookTypeInput = document.querySelector("#itemBookType");
+const itemGradeLevelInput = document.querySelector("#itemGradeLevel");
+const itemSubjectAreaInput = document.querySelector("#itemSubjectArea");
 const itemBrandNameInput = document.querySelector("#itemBrandName");
 const itemBookAuthorInput = document.querySelector("#itemBookAuthor");
 const itemBookPublisherInput = document.querySelector("#itemBookPublisher");
@@ -236,6 +275,8 @@ const addBundleItemLineBtn = document.querySelector("#addBundleItemLineBtn");
 
 const filterTeacher = document.querySelector("#filterTeacher");
 const filterStatus = document.querySelector("#filterStatus");
+const filterCategory = document.querySelector("#filterCategory");
+const filterOfficeType = document.querySelector("#filterOfficeType");
 const filterItemType = document.querySelector("#filterItemType");
 const filterSchool = document.querySelector("#filterSchool");
 const searchInput = document.querySelector("#searchInput");
@@ -260,6 +301,7 @@ const isStockCardPage = window.location.pathname.endsWith("/stock-card.html") ||
 const isInventoryItemPage = window.location.pathname.endsWith("/inventory-item.html") || window.location.pathname.endsWith("inventory-item.html");
 const isInventoryListPage = window.location.pathname.endsWith("/inventory-list.html") || window.location.pathname.endsWith("inventory-list.html");
 const isStockCardItemPage = window.location.pathname.endsWith("/stock-card-item.html") || window.location.pathname.endsWith("stock-card-item.html");
+const isAccountPage = window.location.pathname.endsWith("/profile.html") || window.location.pathname.endsWith("profile.html") || window.location.pathname.endsWith("/settings.html") || window.location.pathname.endsWith("settings.html");
 setActiveNavigationLink();
 const stockInModal = document.querySelector("#stockInModal");
 const stockOutModal = document.querySelector("#stockOutModal");
@@ -274,6 +316,9 @@ const editModal = document.querySelector("#editModal");
 const editInventoryForm = document.querySelector("#editInventoryForm");
 const editItemTeacher = document.querySelector("#editItemTeacher");
 const editItemSchoolNameInput = document.querySelector("#editItemSchoolName");
+const editItemOfficeTypeInput = document.querySelector("#editItemOfficeType");
+const editItemLocationCodeInput = document.querySelector("#editItemLocationCode");
+const editItemSchoolCodeInput = document.querySelector("#editItemSchoolCode");
 const closeModalBtn = document.querySelector("#closeModalBtn");
 const editItemQuantityInput = document.querySelector("#editItemQuantity");
 const editItemQuantityPerPropertyCardInput = document.querySelector("#editItemQuantityPerPropertyCard");
@@ -289,6 +334,9 @@ const editItemAcquiredDetailsInput = document.querySelector("#editItemAcquiredDe
 const editItemCategoryInput = document.querySelector("#editItemCategory");
 const editItemSubcategoryInput = document.querySelector("#editItemSubcategory");
 const editItemBookTitleInput = document.querySelector("#editItemBookTitle");
+const editItemBookTypeInput = document.querySelector("#editItemBookType");
+const editItemGradeLevelInput = document.querySelector("#editItemGradeLevel");
+const editItemSubjectAreaInput = document.querySelector("#editItemSubjectArea");
 const editItemBrandNameInput = document.querySelector("#editItemBrandName");
 const editItemBookAuthorInput = document.querySelector("#editItemBookAuthor");
 const editItemBookPublisherInput = document.querySelector("#editItemBookPublisher");
@@ -361,7 +409,9 @@ if (inventoryForm) {
 if (itemSchoolNameInput) {
   itemSchoolNameInput.addEventListener("input", renderTeacherSelects);
   itemSchoolNameInput.addEventListener("change", renderTeacherSelects);
+  itemSchoolNameInput.addEventListener("change", () => updateSchoolCode(""));
 }
+if (itemOfficeTypeInput) itemOfficeTypeInput.addEventListener("change", () => updateOfficeTypeUI(""));
 
 if (itemQuantityInput) {
   itemQuantityInput.addEventListener("input", updateCreateTotalAmount);
@@ -446,7 +496,9 @@ if (editInventoryForm) {
 if (editItemSchoolNameInput) {
   editItemSchoolNameInput.addEventListener("input", renderTeacherSelects);
   editItemSchoolNameInput.addEventListener("change", renderTeacherSelects);
+  editItemSchoolNameInput.addEventListener("change", () => updateSchoolCode("edit"));
 }
+if (editItemOfficeTypeInput) editItemOfficeTypeInput.addEventListener("change", () => updateOfficeTypeUI("edit"));
 
 if (editItemQuantityInput) {
   editItemQuantityInput.addEventListener("input", updateEditTotalAmount);
@@ -535,6 +587,8 @@ if (filterTeacher) {
 if (filterStatus) {
   filterStatus.addEventListener("change", handleInventoryFilterChange);
 }
+if (filterCategory) filterCategory.addEventListener("change", handleInventoryFilterChange);
+if (filterOfficeType) filterOfficeType.addEventListener("change", handleOfficeFilterChange);
 
 if (filterItemType) {
   filterItemType.addEventListener("change", handleInventoryFilterChange);
@@ -612,6 +666,10 @@ async function initializeApp() {
     }
 
     renderAuthNav();
+    renderAccountPage();
+    if (isAccountPage) {
+      return;
+    }
     await refreshData();
   } catch (error) {
     console.error(error);
@@ -676,9 +734,11 @@ function render() {
   renderAuthNav();
   renderAccessMode();
   renderStats();
+  updateOfficeTypeUI("");
   renderSchoolAutocomplete();
   renderTeacherSelects();
   renderSchoolFilter();
+  renderCategoryFilter();
   renderTeachers();
   renderInventory();
   renderStockCardItemPage();
@@ -686,6 +746,17 @@ function render() {
   updateAcquiredDetailsUI("");
   updateSchoolFieldVisibility();
   renderBookAutocomplete();
+  renderRequestedInventoryItem();
+}
+
+function renderRequestedInventoryItem() {
+  if (!isInventoryItemPage || !editModal?.classList.contains("hidden")) return;
+  const itemId = new URLSearchParams(window.location.search).get("id");
+  if (itemId && state.inventory.some((item) => item.id === itemId)) {
+    document.body.classList.add("inventory-detail-page");
+    if (closeModalBtn) closeModalBtn.textContent = "Back to Inventory List";
+    openEditModal(itemId);
+  }
 }
 
 function renderAccessMode() {
@@ -774,23 +845,36 @@ function renderAuthNav() {
   slot.className = "nav-auth-slot";
 
   if (state.auth.authenticated) {
-    const userLabel = document.createElement("span");
-    userLabel.className = "nav-user-label";
-    userLabel.textContent = state.auth.schoolName
-      ? `${state.auth.username} (${state.auth.schoolName})`
-      : state.auth.username;
+    const settingsLink = document.createElement("a");
+    settingsLink.href = "settings.html";
+    settingsLink.textContent = "Settings";
+    settingsLink.prepend(createNavIcon(navIconPaths["settings.html"]));
+
+    const accountActions = document.createElement("div");
+    accountActions.className = "nav-account-actions";
+
+    const profileLink = document.createElement("a");
+    profileLink.href = "profile.html";
+    profileLink.textContent = "Profile";
+    profileLink.prepend(createNavIcon(navIconPaths["profile.html"]));
 
     const logoutButton = document.createElement("button");
     logoutButton.className = "ghost-btn nav-logout-btn";
     logoutButton.type = "button";
     logoutButton.textContent = "Logout";
+    logoutButton.prepend(createNavIcon('<path d="M10 17l5-5-5-5M15 12H3"/><path d="M14 3h5a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-5"/>'));
     logoutButton.addEventListener("click", handleLogoutClick);
 
-    slot.append(userLabel, logoutButton);
+    const currentPage = window.location.pathname.split("/").pop();
+    settingsLink.classList.toggle("active", currentPage === "settings.html");
+    profileLink.classList.toggle("active", currentPage === "profile.html");
+    accountActions.append(profileLink, logoutButton);
+    slot.append(settingsLink, accountActions);
   } else {
     const loginLink = document.createElement("a");
     loginLink.href = "login.html";
     loginLink.textContent = "Login";
+    loginLink.prepend(createNavIcon('<path d="m14 8 4 4-4 4M18 12H7"/><path d="M10 4H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h5"/>'));
 
     if (isLoginPage) {
       loginLink.className = "active";
@@ -800,6 +884,18 @@ function renderAuthNav() {
   }
 
   topNav.append(slot);
+}
+
+function renderAccountPage() {
+  const username = document.querySelector("#profileUsername");
+  const role = document.querySelector("#profileRole");
+  const school = document.querySelector("#profileSchool");
+  const settingsUsername = document.querySelector("#settingsUsername");
+
+  if (username) username.textContent = state.auth.username || "—";
+  if (role) role.textContent = state.auth.role ? state.auth.role[0].toUpperCase() + state.auth.role.slice(1) : "—";
+  if (school) school.textContent = state.auth.schoolName || "All schools";
+  if (settingsUsername) settingsUsername.textContent = state.auth.username || "—";
 }
 
 async function handleLoginSubmit(event) {
@@ -982,14 +1078,16 @@ function renderSchoolAutocomplete() {
   schoolInputs.forEach((input) => {
     const selectedSchool = state.auth.role === "manager" && state.auth.schoolName
       ? state.auth.schoolName
-      : input.value || "Landahan Elementary School";
+      : input.value || "";
 
     if (input.tagName === "SELECT") {
+      const officeType = input === itemSchoolNameInput ? itemOfficeTypeInput?.value : input === editItemSchoolNameInput ? editItemOfficeTypeInput?.value : "";
+      const availableSchools = ["ES", "HS"].includes(officeType) ? getSchoolsForOfficeType(officeType, schoolNames) : schoolNames;
       input.innerHTML = [
         '<option value="">Select school</option>',
-        ...schoolNames.map((schoolName) => `<option value="${escapeHtml(schoolName)}">${escapeHtml(schoolName)}</option>`),
+        ...availableSchools.map((schoolName) => `<option value="${escapeHtml(schoolName)}">${escapeHtml(schoolName)}</option>`),
       ].join("");
-      input.value = schoolNames.includes(selectedSchool) ? selectedSchool : "";
+      input.value = availableSchools.includes(selectedSchool) ? selectedSchool : "";
       input.disabled = state.auth.role === "manager" && Boolean(state.auth.schoolName);
       return;
     }
@@ -1000,13 +1098,69 @@ function renderSchoolAutocomplete() {
   });
 }
 
+function inferOfficeType(name) {
+  if (/elementary school/i.test(name || "")) return "ES";
+  if (/high school/i.test(name || "")) return "HS";
+  return ["OSDS", "SGOD", "CID"].includes(name) ? name : "";
+}
+
+function getSchoolsForOfficeType(type, names = getSchoolNames()) {
+  return Object.keys(type === "ES" ? ELEMENTARY_SCHOOL_CODES : HIGH_SCHOOL_CODES);
+}
+
+function updateOfficeTypeUI(prefix) {
+  const office = prefix === "edit" ? editItemOfficeTypeInput : itemOfficeTypeInput;
+  const school = prefix === "edit" ? editItemSchoolNameInput : itemSchoolNameInput;
+  if (!office || !school) return;
+  if (state.auth.role === "manager" && state.auth.schoolName) office.value = inferOfficeType(state.auth.schoolName);
+  const showSchool = ["ES", "HS"].includes(office.value);
+  const schoolWrap = school.closest("label");
+  schoolWrap?.classList.toggle("hidden", !showSchool);
+  if (schoolWrap) schoolWrap.hidden = !showSchool;
+  const locationCode = prefix === "edit" ? editItemLocationCodeInput : itemLocationCodeInput;
+  const schoolCode = prefix === "edit" ? editItemSchoolCodeInput : itemSchoolCodeInput;
+  locationCode.value = LOCATION_CODES[office.value] || "";
+  schoolCode.closest("label")?.classList.toggle("hidden", !showSchool);
+  school.required = showSchool;
+  schoolCode.required = showSchool;
+  if (!showSchool) school.value = "";
+  renderSchoolAutocomplete();
+  updateSchoolCode(prefix);
+  renderTeacherSelects();
+}
+
+function updateSchoolCode(prefix) {
+  const office = prefix === "edit" ? editItemOfficeTypeInput : itemOfficeTypeInput;
+  const school = prefix === "edit" ? editItemSchoolNameInput : itemSchoolNameInput;
+  const code = prefix === "edit" ? editItemSchoolCodeInput : itemSchoolCodeInput;
+  const mapping = office?.value === "ES" ? ELEMENTARY_SCHOOL_CODES : office?.value === "HS" ? HIGH_SCHOOL_CODES : {};
+  if (code) code.value = mapping[school?.value] || "";
+}
+
+function getInventoryOfficeLocation(prefix) {
+  const office = prefix === "edit" ? editItemOfficeTypeInput : itemOfficeTypeInput;
+  const school = prefix === "edit" ? editItemSchoolNameInput : itemSchoolNameInput;
+  return ["ES", "HS"].includes(office?.value) ? school?.value.trim() || "" : office?.value || "";
+}
+
 function renderSchoolFilter() {
   if (!filterSchool) {
     return;
   }
 
   const selectedSchool = filterSchool.value;
-  const schoolNames = getSchoolNames();
+  const officeType = filterOfficeType?.value;
+  const wrap = filterSchool.closest("label");
+  const showSchool = ["ES", "HS"].includes(officeType);
+  if (filterOfficeType) {
+    wrap?.classList.toggle("hidden", !showSchool);
+    if (wrap) wrap.hidden = !showSchool;
+    if (!showSchool) {
+      filterSchool.innerHTML = '<option value="All">All Schools</option>';
+      return;
+    }
+  }
+  const schoolNames = showSchool ? getSchoolsForOfficeType(officeType) : getSchoolNames();
   const schoolOptions = schoolNames
     .map((schoolName) => `<option value="${escapeHtml(schoolName)}">${escapeHtml(schoolName)}</option>`)
     .join("");
@@ -1024,6 +1178,14 @@ function renderSchoolFilter() {
   if (selectedSchool === "All" || schoolNames.includes(selectedSchool)) {
     filterSchool.value = selectedSchool;
   }
+}
+
+function renderCategoryFilter() {
+  if (!filterCategory) return;
+  const selected = filterCategory.value;
+  const categories = Object.values(PROPERTY_CLASSIFICATIONS).map((classification) => classification.name).sort((a, b) => a.localeCompare(b));
+  filterCategory.innerHTML = ['<option value="All">All Categories</option>', ...categories.map((category) => `<option value="${escapeHtml(category)}">${escapeHtml(category)}</option>`)].join("");
+  if (categories.includes(selected)) filterCategory.value = selected;
 }
 
 async function handleTeacherSubmit(event) {
@@ -1203,13 +1365,20 @@ async function handleInventorySubmit(event) {
     subcategoryCode: document.querySelector("#itemSubcategoryCode").value,
     description: document.querySelector("#itemDescription").value.trim(),
     dateReceived: document.querySelector("#itemDateReceived").value,
+    yearAcquired: Number(document.querySelector("#itemYearAcquired").value),
+    officeType: itemOfficeTypeInput.value,
+    locationCode: itemLocationCodeInput.value,
+    schoolCode: itemSchoolCodeInput.value,
     brandName: document.querySelector("#itemBrandName").value.trim(),
     modelNumber: itemModelNumberInput.value.trim(),
     serialNumber: itemSerialNumberInput.value.trim(),
     bookTitle: document.querySelector("#itemBookTitle").value.trim(),
+    bookType: itemBookTypeInput.value,
+    gradeLevel: itemGradeLevelInput.value,
+    subjectArea: itemSubjectAreaInput.value,
     bookAuthor: itemBookAuthorInput.value.trim(),
     bookPublisher: document.querySelector("#itemBookPublisher").value.trim(),
-    schoolName: document.querySelector("#itemSchoolName").value.trim(),
+    schoolName: getInventoryOfficeLocation(""),
     assetTag: document.querySelector("#itemTag").value.trim(),
     quantity: Number(document.querySelector("#itemQuantity").value),
     quantityPerPropertyCard: Number(document.querySelector("#itemQuantityPerPropertyCard").value),
@@ -1252,7 +1421,8 @@ async function handleInventorySubmit(event) {
     document.querySelector("#itemUsableCount").value = 0;
     document.querySelector("#itemNonUsableCount").value = 0;
     document.querySelector("#itemUnit").value = "";
-    document.querySelector("#itemSchoolName").value = "Landahan Elementary School";
+    document.querySelector("#itemSchoolName").value = "";
+    updateOfficeTypeUI("");
     document.querySelector("#itemAssetType").value = "PPE";
     itemFormInput.value = "Single";
     updateBundleItemsUI("");
@@ -1276,7 +1446,8 @@ function renderInventory() {
     return;
   }
 
-  const filteredItems = getFilteredInventoryItems();
+  let filteredItems = getFilteredInventoryItems();
+  if (isInventoryListPage) filteredItems = filteredItems.filter((item) => Number(item.quantityPerPhysicalCount) !== 0);
   const shouldPaginateInventory = isInventoryListPage || isStockCardPage;
   const totalPages = shouldPaginateInventory ? Math.max(1, Math.ceil(filteredItems.length / LISTING_PAGE_SIZE)) : 1;
 
@@ -1300,6 +1471,11 @@ function renderInventory() {
   const paginatedItems = shouldPaginateInventory
     ? filteredItems.slice((currentInventoryPage - 1) * LISTING_PAGE_SIZE, currentInventoryPage * LISTING_PAGE_SIZE)
     : filteredItems;
+
+  if (isInventoryListPage) {
+    renderInventoryListingTable(paginatedItems, totalPages);
+    return;
+  }
 
   inventoryTableWrap.innerHTML = `
     <table>
@@ -1368,9 +1544,10 @@ function renderInventory() {
                 <td>${escapeHtml(item.location)}</td>
                 <td>
                   <div class="table-actions">
+                    ${isInventoryListPage ? `<a class="primary-btn table-action-btn" data-action="edit-view" href="inventory-item.html?id=${encodeURIComponent(item.id)}">View</a>` : ""}
                     ${
                       state.auth.authenticated
-                        ? `
+                        ? isInventoryListPage ? "" : `
                           ${
                             isStockCardPage
                               ? `<button class="primary-btn table-action-btn" type="button" data-action="stock-in-item" data-item-id="${item.id}">Stock In</button>
@@ -1402,9 +1579,49 @@ function renderInventory() {
   `;
 }
 
+function renderInventoryListingTable(items, totalPages) {
+  inventoryTableWrap.innerHTML = `
+    <table>
+      <thead><tr><th>Item</th><th>Details</th><th>Physical Count</th><th>Assignment</th><th>Actions</th></tr></thead>
+      <tbody>${items.map((item) => {
+        const teacher = state.teachers.find((entry) => entry.id === item.teacherId);
+        return `<tr>
+          <td><strong>${escapeHtml(item.name)}</strong><br>
+            ${renderListingField("Book Title", item.bookTitle)}
+            ${renderListingField("Category", item.category)}
+            ${renderListingField("Sub-Category", item.subcategory)}
+            ${renderListingField("Property Number", item.assetTag)}
+            ${renderListingField("Type of Item", item.assetType ? formatItemTypeLabel(item.assetType) : "")}
+          </td>
+          <td>${renderListingField("Description", item.description)}
+            ${renderListingField("Brand", item.brandName)}
+            ${renderListingField("Serial Number", item.serialNumber)}
+            ${renderListingField("Model", item.modelNumber)}
+            ${renderListingField("Book Author", item.bookAuthor)}
+          </td>
+          <td><strong>${Number(item.quantityPerPhysicalCount)}</strong>${item.unitOfMeasurement ? `<br><span class="notes">${escapeHtml(item.unitOfMeasurement)}</span>` : ""}</td>
+          <td>${teacher ? `${escapeHtml(getTeacherDisplayName(teacher))}<br>` : ""}${renderListingField("Location", item.location)}</td>
+          <td><div class="table-actions"><a class="primary-btn table-action-btn" data-action="edit-view" href="inventory-item.html?id=${encodeURIComponent(item.id)}">View</a></div></td>
+        </tr>`;
+      }).join("")}</tbody>
+    </table>
+    <div class="pagination-bar">
+      <button class="ghost-btn pagination-btn" type="button" data-action="inventory-page-prev" ${currentInventoryPage === 1 ? "disabled" : ""}>Previous</button>
+      <span class="notes">Page ${currentInventoryPage} of ${totalPages}</span>
+      <button class="ghost-btn pagination-btn" type="button" data-action="inventory-page-next" ${currentInventoryPage === totalPages ? "disabled" : ""}>Next</button>
+    </div>`;
+}
+
+function renderListingField(label, value) {
+  const text = String(value || "").trim();
+  return text ? `<span class="notes">${escapeHtml(label)}: ${escapeHtml(text)}</span><br>` : "";
+}
+
 function getFilteredInventoryItems() {
   const teacherFilterValue = filterTeacher ? filterTeacher.value : "All";
   const statusFilterValue = filterStatus ? filterStatus.value : "All";
+  const categoryFilterValue = filterCategory ? filterCategory.value : "All";
+  const officeFilterValue = filterOfficeType ? filterOfficeType.value : "All";
   const itemTypeFilterValue = filterItemType ? filterItemType.value : "All";
   const schoolFilterValue = filterSchool ? filterSchool.value : "All";
   const searchValue = searchInput ? searchInput.value.trim().toLowerCase() : "";
@@ -1414,6 +1631,8 @@ function getFilteredInventoryItems() {
     const inventoryItemMatch = !isInventoryItemPage || item.assetType !== "Not Expandable";
     const teacherMatch = teacherFilterValue === "All" || item.teacherId === teacherFilterValue;
     const statusMatch = statusFilterValue === "All" || item.status === statusFilterValue;
+    const categoryMatch = categoryFilterValue === "All" || item.category === categoryFilterValue;
+    const officeMatch = officeFilterValue === "All" || item.officeType === officeFilterValue;
     const itemTypeMatch = itemTypeFilterValue === "All" || item.assetType === itemTypeFilterValue;
     const schoolMatch = schoolFilterValue === "All" || item.schoolName === schoolFilterValue;
     const searchMatch =
@@ -1450,7 +1669,7 @@ function getFilteredInventoryItems() {
         .toLowerCase()
         .includes(searchValue);
 
-    return stockCardMatch && inventoryItemMatch && teacherMatch && statusMatch && itemTypeMatch && schoolMatch && searchMatch;
+    return stockCardMatch && inventoryItemMatch && teacherMatch && statusMatch && categoryMatch && officeMatch && itemTypeMatch && schoolMatch && searchMatch;
   });
 }
 
@@ -2020,6 +2239,12 @@ function handleInventoryFilterChange() {
   renderInventory();
 }
 
+function handleOfficeFilterChange() {
+  if (filterSchool) filterSchool.value = "All";
+  renderSchoolFilter();
+  handleInventoryFilterChange();
+}
+
 function handleTeacherFilterChange() {
   currentTeacherPage = 1;
   renderTeachers();
@@ -2075,7 +2300,8 @@ async function handleInventoryTableClick(event) {
   }
 
   if (nextPageButton) {
-    const totalPages = Math.max(1, Math.ceil(getFilteredInventoryItems().length / LISTING_PAGE_SIZE));
+    const pageItems = getFilteredInventoryItems().filter((item) => !isInventoryListPage || Number(item.quantityPerPhysicalCount) !== 0);
+    const totalPages = Math.max(1, Math.ceil(pageItems.length / LISTING_PAGE_SIZE));
     currentInventoryPage = Math.min(totalPages, currentInventoryPage + 1);
     renderInventory();
     return;
@@ -2164,15 +2390,24 @@ function openEditModal(itemId) {
   document.querySelector("#editItemSubcategoryCode").value = item.subcategoryCode || "";
   document.querySelector("#editItemDescription").value = item.description || "";
   document.querySelector("#editItemDateReceived").value = item.dateReceived || "";
+  document.querySelector("#editItemYearAcquired").value = item.yearAcquired || "";
+  editItemOfficeTypeInput.value = item.officeType || inferOfficeType(item.schoolName);
+  updateOfficeTypeUI("edit");
+  editItemLocationCodeInput.value = item.locationCode || LOCATION_CODES[editItemOfficeTypeInput.value] || "";
   document.querySelector("#editItemBrandName").value = item.brandName || "";
   editItemModelNumberInput.value = item.modelNumber || "";
   editItemSerialNumberInput.value = item.serialNumber || "";
   document.querySelector("#editItemBookTitle").value = item.bookTitle || "";
+  editItemBookTypeInput.value = item.bookType || "";
+  editItemGradeLevelInput.value = item.gradeLevel || "";
+  renderSubjectAreaOptions();
+  editItemSubjectAreaInput.value = item.subjectArea || "";
   editItemBookAuthorInput.value = item.bookAuthor || "";
   document.querySelector("#editItemBookPublisher").value = item.bookPublisher || "";
   updateBookFieldsUI("edit");
   updateEquipmentFieldsUI("edit");
-  document.querySelector("#editItemSchoolName").value = item.schoolName || "Landahan Elementary School";
+  document.querySelector("#editItemSchoolName").value = ["ES", "HS"].includes(editItemOfficeTypeInput.value) ? item.schoolName || "" : "";
+  updateSchoolCode("edit");
   renderTeacherSelects();
   document.querySelector("#editItemTag").value = item.assetTag;
   document.querySelector("#editItemQuantity").value = item.quantity;
@@ -2227,13 +2462,20 @@ async function handleEditInventorySubmit(event) {
     subcategoryCode: document.querySelector("#editItemSubcategoryCode").value,
     description: document.querySelector("#editItemDescription").value.trim(),
     dateReceived: document.querySelector("#editItemDateReceived").value,
+    yearAcquired: Number(document.querySelector("#editItemYearAcquired").value),
+    officeType: editItemOfficeTypeInput.value,
+    locationCode: editItemLocationCodeInput.value,
+    schoolCode: editItemSchoolCodeInput.value,
     brandName: document.querySelector("#editItemBrandName").value.trim(),
     modelNumber: editItemModelNumberInput.value.trim(),
     serialNumber: editItemSerialNumberInput.value.trim(),
     bookTitle: document.querySelector("#editItemBookTitle").value.trim(),
+    bookType: editItemBookTypeInput.value,
+    gradeLevel: editItemGradeLevelInput.value,
+    subjectArea: editItemSubjectAreaInput.value,
     bookAuthor: editItemBookAuthorInput.value.trim(),
     bookPublisher: document.querySelector("#editItemBookPublisher").value.trim(),
-    schoolName: document.querySelector("#editItemSchoolName").value.trim(),
+    schoolName: getInventoryOfficeLocation("edit"),
     assetTag: document.querySelector("#editItemTag").value.trim(),
     quantity: Math.max(1, Number(document.querySelector("#editItemQuantity").value) || 1),
     quantityPerPropertyCard: Math.max(0, Number(document.querySelector("#editItemQuantityPerPropertyCard").value) || 0),
@@ -2269,6 +2511,11 @@ async function handleEditInventorySubmit(event) {
       body: JSON.stringify(updatedItem),
     });
 
+    if (document.body.classList.contains("inventory-detail-page")) {
+      window.location.replace("inventory-list.html");
+      return;
+    }
+
     closeEditModal();
     await refreshData();
   } catch (error) {
@@ -2278,6 +2525,10 @@ async function handleEditInventorySubmit(event) {
 }
 
 function closeEditModal() {
+  if (document.body.classList.contains("inventory-detail-page")) {
+    window.location.href = "inventory-list.html";
+    return;
+  }
   if (!editModal || !editInventoryForm) {
     return;
   }
@@ -2291,6 +2542,7 @@ function closeEditModal() {
 }
 
 function handleModalBackdropClick(event) {
+  if (document.body.classList.contains("inventory-detail-page")) return;
   if (event.target === editModal) {
     closeEditModal();
   }
@@ -2718,15 +2970,21 @@ function updateBookFieldsUI(prefix) {
   const categoryInput = prefix === "edit" ? editItemCategoryInput : itemCategoryInput;
   const subcategoryInput = prefix === "edit" ? editItemSubcategoryInput : itemSubcategoryInput;
   const titleInput = prefix === "edit" ? editItemBookTitleInput : itemBookTitleInput;
+  const typeInput = prefix === "edit" ? editItemBookTypeInput : itemBookTypeInput;
+  const gradeInput = prefix === "edit" ? editItemGradeLevelInput : itemGradeLevelInput;
+  const subjectInput = prefix === "edit" ? editItemSubjectAreaInput : itemSubjectAreaInput;
   const authorInput = prefix === "edit" ? editItemBookAuthorInput : itemBookAuthorInput;
   const publisherInput = prefix === "edit" ? editItemBookPublisherInput : itemBookPublisherInput;
-  const selectedSubcategory = PROPERTY_CLASSIFICATIONS[categoryInput?.value]?.subcategories
-    .find((entry) => entry.name === subcategoryInput?.value);
-  const isStandardTextbook = categoryInput?.value === "55" && selectedSubcategory?.code === "10";
-  const isReferenceMaterial = categoryInput?.value === "55" && selectedSubcategory?.code === "20";
+  const selectedSubcategory = subcategoryInput?.value || "";
+  const isBooksCategory = categoryInput?.value === "55";
+  const isStandardTextbook = isBooksCategory && selectedSubcategory.startsWith("Standard Textbooks");
+  const isReferenceMaterial = isBooksCategory && selectedSubcategory.startsWith("Reference Manuals");
 
   [
     [titleInput, isStandardTextbook || isReferenceMaterial],
+    [typeInput, isStandardTextbook],
+    [gradeInput, isStandardTextbook],
+    [subjectInput, isStandardTextbook],
     [authorInput, isStandardTextbook],
     [publisherInput, isStandardTextbook || isReferenceMaterial],
   ].forEach(([input, isVisible]) => {
@@ -2744,10 +3002,6 @@ function updateBookFieldsUI(prefix) {
 }
 
 function renderBookAutocomplete() {
-  if (!state.bookCatalog.length) {
-    return;
-  }
-
   const fields = [
     ["bookTitleOptions", "title", [itemBookTitleInput, editItemBookTitleInput]],
     ["bookAuthorOptions", "authors", [itemBookAuthorInput, editItemBookAuthorInput]],
@@ -2767,6 +3021,20 @@ function renderBookAutocomplete() {
       .sort((a, b) => a.localeCompare(b));
     dataList.innerHTML = values.map((value) => `<option value="${escapeHtml(value)}"></option>`).join("");
     inputs.filter(Boolean).forEach((input) => input.setAttribute("list", listId));
+  });
+
+  renderSubjectAreaOptions();
+}
+
+function renderSubjectAreaOptions() {
+  const fallbackSubjects = ["Araling Panlipunan", "Edukasyon Pantahanan at Pangkabuhayan", "English", "Filipino", "Good Manners and Right Conduct (GMRC)", "Health", "Language", "Makabansa", "Mathematics", "Musics and Arts", "Physical Education", "Reading and Literacy", "Science", "Technology and Livelihood Education", "Values Education"];
+  const catalogSubjects = state.bookCatalog.map((book) => String(book.subjects || "").trim()).filter(Boolean);
+  const subjects = [...new Set([...fallbackSubjects, ...catalogSubjects])].sort((a, b) => a.localeCompare(b));
+
+  [itemSubjectAreaInput, editItemSubjectAreaInput].filter(Boolean).forEach((select) => {
+    const currentValue = select.value;
+    select.innerHTML = ['<option value="">Select subject area</option>', ...subjects.map((subject) => `<option value="${escapeHtmlAttribute(subject)}">${escapeHtml(subject)}</option>`)].join("");
+    if (subjects.includes(currentValue)) select.value = currentValue;
   });
 }
 
@@ -2829,11 +3097,11 @@ function renderCategoryOptions() {
 function reorderAddInventoryFields() {
   const grid = inventoryForm?.querySelector(".input-grid");
   const orderedFieldIds = [
-    "itemSchoolName", "itemName", "itemDescription", "itemCategory", "itemSubcategory",
-    "itemBookTitle", "itemBookAuthor", "itemBookPublisher", "itemBrandName", "itemModelNumber", "itemSerialNumber",
+    "itemOfficeType", "itemLocationCode", "itemSchoolName", "itemSchoolCode", "itemName", "itemDescription", "itemYearAcquired", "itemDateReceived", "itemCategory", "itemSubcategory",
+    "itemBookTitle", "itemBookType", "itemGradeLevel", "itemSubjectArea", "itemBookAuthor", "itemBookPublisher", "itemBrandName", "itemModelNumber", "itemSerialNumber",
     "itemCategoryCode", "itemSubcategoryCode", "itemUacsCode", "itemTag",
     "itemForm", "itemBundleItemsWrap", "itemAmount", "itemAssetType", "itemFundClusterCode", "itemUnit",
-    "itemAcquiredType", "itemAcquiredDetails", "itemReferenceNumber", "itemDateReceived",
+    "itemAcquiredType", "itemAcquiredDetails", "itemReferenceNumber",
     "itemQuantity", "itemTotalAmount", "itemQuantityPerPropertyCard", "itemQuantityPerPhysicalCount",
     "itemUsableCount", "itemNonUsableCount", "itemIcsNumberSource", "itemIcsNumberDistribute",
     "itemTeacher", "itemAssignedDate", "itemLocation", "itemStatus", "itemNotes",

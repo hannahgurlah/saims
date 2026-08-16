@@ -33,8 +33,7 @@
     <header class="page-header">
       <p class="eyebrow">Records</p>
       <h1 class="page-title">Inventory Listing</h1>
-      <p class="hero-copy">Review all inventory records, filter the list, and edit or delete each item from the popup
-        modal.</p>
+      <p class="hero-copy">Review all inventory records, filter the list, and open an individual item to view or edit its details.</p>
     </header>
 
     <main>
@@ -49,16 +48,9 @@
 
         <div class="panel-heading">
           <div class="filter-bar">
-            <label>
-              <span>Status</span>
-              <select id="filterStatus">
-                <option value="All">All Statuses</option>
-                <option value="Assigned">Assigned</option>
-                <option value="Available">Available</option>
-                <option value="Maintenance">Maintenance</option>
-                <option value="Retired">For Repair / Not Working</option>
-              </select>
-            </label>
+            <label><span>Category</span><select id="filterCategory"><option value="All">All Categories</option></select></label>
+            <label><span>Type of Office</span><select id="filterOfficeType"><option value="All">All Offices</option><option value="OSDS">OSDS</option><option value="SGOD">SGOD</option><option value="CID">CID</option><option value="HS">High School</option><option value="ES">Elementary School</option></select></label>
+            <label id="filterSchoolWrap" class="hidden" hidden><span>School</span><select id="filterSchool"><option value="All">All Schools</option></select></label>
             <label>
               <span>Teacher</span>
               <select id="filterTeacher">

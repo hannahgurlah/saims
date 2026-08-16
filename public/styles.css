@@ -54,7 +54,6 @@ a {
   gap: 38px;
   padding: 30px 22px 24px;
   background: var(--sidebar);
-  border-radius: 0 24px 24px 0;
   box-shadow: 8px 0 30px rgba(17, 17, 31, 0.14);
 }
 
@@ -127,48 +126,17 @@ a {
   transition: background 160ms ease, color 160ms ease, transform 160ms ease;
 }
 
-.nav-links a::before {
-  content: "";
+.nav-icon {
   width: 22px;
   height: 22px;
-  border: 2px solid currentColor;
-  border-radius: 6px;
   opacity: 0.96;
   flex: 0 0 auto;
   margin-right: 18px;
-}
-
-.nav-links a[href$="teachers.html"]::before {
-  border-radius: 999px;
-  box-shadow: inset 0 0 0 5px var(--sidebar);
-}
-
-.nav-links a[href$="inventory-item.html"]::before {
-  width: 19px;
-  height: 19px;
-  border-radius: 4px 7px 4px 7px;
-  transform: rotate(45deg);
-}
-
-.nav-links a[href$="inventory-list.html"]::before {
-  border: 0;
-  border-radius: 2px;
-  background:
-    repeating-linear-gradient(to right, currentColor 0 2px, transparent 2px 7px),
-    repeating-linear-gradient(to bottom, currentColor 0 2px, transparent 2px 7px);
-}
-
-.nav-links a[href$="stock-card.html"]::before {
-  border-radius: 5px;
-}
-
-.nav-links a[href$="reports.html"]::before {
-  border: 0;
-  border-radius: 0;
-  background:
-    linear-gradient(currentColor 0 0) 2px 10px / 4px 12px no-repeat,
-    linear-gradient(currentColor 0 0) 9px 5px / 4px 17px no-repeat,
-    linear-gradient(currentColor 0 0) 16px 1px / 4px 21px no-repeat;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .nav-links a.active,
@@ -202,23 +170,26 @@ a {
   margin-top: auto;
 }
 
-.nav-auth-slot a {
-  display: grid;
-  place-items: center;
-  width: 48px;
-  height: 48px;
+.nav-auth-slot a,
+.nav-logout-btn {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 48px;
   color: #a9b9d5;
-  padding: 0;
+  padding: 0 16px;
   border-radius: var(--radius);
   text-decoration: none;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.06);
-  font-size: 0;
+  border: 0;
+  background: transparent;
+  font-size: 0.98rem;
+  font-weight: 500;
+  text-align: left;
 }
 
-.nav-auth-slot a::before {
-  content: "↪";
-  font-size: 1.2rem;
+.nav-auth-slot .nav-icon,
+.nav-logout-btn .nav-icon {
+  margin-right: 14px;
 }
 
 .nav-auth-slot a.active,
@@ -239,20 +210,14 @@ a {
   text-overflow: ellipsis;
 }
 
-.nav-logout-btn {
-  width: 48px;
-  height: 48px;
-  padding: 0;
-  background: rgba(255, 255, 255, 0.08);
-  color: #d7e2f6;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  font-size: 0;
+.nav-account-actions {
+  display: grid;
+  gap: 2px;
+  margin-top: 26px;
 }
 
-.nav-logout-btn::before {
-  content: "↪";
-  font-size: 1.2rem;
-  line-height: 1;
+.nav-logout-btn {
+  color: #d7e2f6;
 }
 
 .nav-logout-btn:hover {
@@ -276,6 +241,38 @@ a {
   font-size: clamp(1.8rem, 3vw, 2.4rem);
   line-height: 1.12;
 }
+
+.account-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.account-card {
+  padding: 24px;
+}
+
+.account-card-wide {
+  grid-column: 1 / -1;
+}
+
+.account-details {
+  display: grid;
+  gap: 0;
+  margin: 18px 0 0;
+}
+
+.account-details div {
+  display: grid;
+  grid-template-columns: minmax(120px, 0.35fr) 1fr;
+  gap: 18px;
+  padding: 15px 0;
+  border-top: 1px solid var(--line);
+}
+
+.account-details dt { color: var(--muted); font-weight: 600; }
+.account-details dd { margin: 0; font-weight: 700; }
+.account-status { color: var(--success); font-weight: 700; }
 
 .hero {
   grid-template-columns: minmax(0, 1fr) minmax(260px, 360px);
@@ -395,7 +392,7 @@ h3 {
 }
 
 .panel {
-  padding: 0;
+  padding: 20px 25px;
   overflow: hidden;
 }
 
@@ -869,6 +866,8 @@ tbody tr:hover {
   white-space: nowrap;
 }
 
+a.table-action-btn { text-decoration: none; }
+
 .table-delete-btn::before {
   content: "⌫";
 }
@@ -920,6 +919,49 @@ tbody tr:hover {
   display: none;
 }
 
+.inventory-detail-page .page-header,
+.inventory-detail-page .page-shell > main {
+  display: none;
+}
+
+.inventory-detail-page .page-shell {
+  min-height: 0;
+  padding: 0;
+}
+
+.inventory-detail-page .modal-backdrop {
+  position: static;
+  display: block;
+  min-height: 100vh;
+  padding: 28px 28px 56px calc(var(--sidebar-width) + 32px);
+  background: var(--bg);
+}
+
+.inventory-detail-page .modal-card {
+  width: 100%;
+  max-width: none;
+  max-height: none;
+  overflow: visible;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.inventory-detail-page .modal-heading {
+  position: static;
+  padding: 0 0 22px;
+  background: transparent;
+  border-bottom: 1px solid var(--line);
+}
+
+.inventory-detail-page .modal-card > .stack-form {
+  margin-top: 22px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+
 .empty-state {
   padding: 32px 24px;
   text-align: center;
@@ -932,6 +974,10 @@ tbody tr:hover {
   }
 
   .page-shell {
+    padding: 92px 16px 42px;
+  }
+
+  .inventory-detail-page .modal-backdrop {
     padding: 92px 16px 42px;
   }
 
@@ -978,7 +1024,7 @@ tbody tr:hover {
     font-size: 0;
   }
 
-  .nav-links a::before {
+  .nav-links .nav-icon {
     margin-right: 0;
   }
 
@@ -1000,8 +1046,18 @@ tbody tr:hover {
 
   .nav-auth-slot a,
   .nav-auth-slot button {
+    width: 42px;
+    min-height: 42px;
+    padding: 0;
+    justify-content: center;
+    font-size: 0;
     text-align: center;
   }
+
+  .nav-auth-slot .nav-icon,
+  .nav-logout-btn .nav-icon { margin-right: 0; }
+
+  .nav-account-actions { display: flex; margin-top: 0; }
 
   .nav-user-label {
     display: none;
@@ -1014,7 +1070,8 @@ tbody tr:hover {
   }
 
   .hero,
-  .grid {
+  .grid,
+  .account-grid {
     grid-template-columns: 1fr;
   }
 
