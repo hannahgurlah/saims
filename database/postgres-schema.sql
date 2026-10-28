@@ -103,7 +103,7 @@ CREATE TABLE IF NOT EXISTS app_users (
   id TEXT PRIMARY KEY,
   username TEXT NOT NULL UNIQUE,
   password_hash TEXT NOT NULL,
-  role TEXT NOT NULL CHECK (role IN ('admin', 'manager', 'staff')),
+  role TEXT NOT NULL CHECK (role IN ('admin', 'manager', 'supervisor', 'staff')),
   school_name TEXT NOT NULL DEFAULT '',
   last_name TEXT NOT NULL DEFAULT '',
   first_name TEXT NOT NULL DEFAULT '',

@@ -682,7 +682,16 @@ async function initializeApp() {
   }
 }
 
-const USER_ASSIGNMENTS = { manager: ["OSDS", "SGOD", "CID", "Elementary Schools", "High Schools"], staff: ["Awihao Elementary School", "Bato Elementary School", "Fudencio Dolino Elementary School", "Ibo Elementary School", "Landahan Elementary School", "Lower Tubod Elementary School", "Toledo National Vocational School"] };
+const SCHOOL_ASSIGNMENTS = [...Object.keys(ELEMENTARY_SCHOOL_CODES), ...Object.keys(HIGH_SCHOOL_CODES)];
+const USER_ASSIGNMENTS = {
+  manager: ["OSDS", "SGOD", "CID", "Elementary Schools", "High Schools"],
+  supervisor: ["OSDS", "SGOD", "CID", ...SCHOOL_ASSIGNMENTS],
+  staff: SCHOOL_ASSIGNMENTS,
+};
+
+function hasAssignedScope() {
+  return ["manager", "supervisor", "staff"].includes(state.auth.role) && Boolean(state.auth.schoolName);
+}
 
 function showUserMessage(id, message, isError = false) { const el = document.getElementById(id); if (!el) return; el.textContent = message; el.classList.remove("hidden"); el.classList.toggle("error", isError); }
 
@@ -704,10 +713,33 @@ async function initializeUsersPage() {
   } catch (error) { body.innerHTML = '<tr><td colspan="7" class="empty-state">Unable to load registered users.</td></tr>'; }
 }
 
-function updateUserAssignmentOptions(selected = "") { const role = document.querySelector("#userRole")?.value; const wrap = document.querySelector("#userAssignmentWrap"); const select = document.querySelector("#userAssignment"); const summary = document.querySelector("#roleSummary"); if (!wrap || !select) return; wrap.hidden = role === "admin"; select.required = role !== "admin"; const options = USER_ASSIGNMENTS[role] || []; select.innerHTML = '<option value="">Select assignment</option>' + options.map((v) => `<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`).join(""); if (selected && !options.includes(selected)) select.insertAdjacentHTML("beforeend", `<option value="${escapeHtml(selected)}">${escapeHtml(selected)}</option>`); select.value = selected; summary.textContent = role === "admin" ? "Admins can manage all offices and schools." : role === "manager" ? "Managers can manage one specific office and its sub-offices or schools." : "Staff can manage one specific school only."; }
+function updateUserAssignmentOptions(selected = "") {
+  const role = document.querySelector("#userRole")?.value;
+  const wrap = document.querySelector("#userAssignmentWrap");
+  const select = document.querySelector("#userAssignment");
+  const summary = document.querySelector("#roleSummary");
+  if (!wrap || !select) return;
+  wrap.hidden = role === "admin";
+  select.required = role !== "admin";
+  const options = USER_ASSIGNMENTS[role] || [];
+  select.innerHTML = '<option value="">Select assignment</option>' + options.map((v) => `<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`).join("");
+  if (selected && !options.includes(selected)) select.insertAdjacentHTML("beforeend", `<option value="${escapeHtml(selected)}">${escapeHtml(selected)}</option>`);
+  select.value = selected;
+  summary.textContent = role === "admin"
+    ? "Admins can manage all offices and schools."
+    : role === "manager"
+      ? "Managers can manage one specific office and its sub-offices or schools."
+      : role === "supervisor"
+        ? "Supervisors are School Heads who can manage one assigned school or office only."
+        : "Staff can manage one specific school only.";
+}
 
 async function initializeUserSettingsPage() {
   const form = document.querySelector("#userSettingsForm"); if (!form) return;
+  const roleSelect = document.querySelector("#userRole");
+  if (roleSelect && !roleSelect.querySelector('option[value="supervisor"]')) {
+    roleSelect.querySelector('option[value="staff"]')?.insertAdjacentHTML("beforebegin", '<option value="supervisor">Supervisor (School Head)</option>');
+  }
   if (state.auth.role !== "admin") { form.innerHTML = '<div class="empty-state">Administrator access is required.</div>'; return; }
   const middleNameInput = document.querySelector("#userMiddleName");
   if (middleNameInput && !document.querySelector("#userEmail")) {
@@ -1091,7 +1123,7 @@ function buildTeacherOptionsForSchool(schoolName) {
 }
 
 function getSchoolNames() {
-  if (state.auth.role === "manager" && state.auth.schoolName) {
+  if (hasAssignedScope()) {
     return [state.auth.schoolName];
   }
 
@@ -1128,7 +1160,7 @@ function renderSchoolAutocomplete() {
     .join("");
 
   schoolInputs.forEach((input) => {
-    const selectedSchool = state.auth.role === "manager" && state.auth.schoolName
+    const selectedSchool = hasAssignedScope()
       ? state.auth.schoolName
       : input.value || "";
 
@@ -1140,13 +1172,13 @@ function renderSchoolAutocomplete() {
         ...availableSchools.map((schoolName) => `<option value="${escapeHtml(schoolName)}">${escapeHtml(schoolName)}</option>`),
       ].join("");
       input.value = availableSchools.includes(selectedSchool) ? selectedSchool : "";
-      input.disabled = state.auth.role === "manager" && Boolean(state.auth.schoolName);
+      input.disabled = hasAssignedScope();
       return;
     }
 
     input.setAttribute("list", "schoolNameOptions");
     input.value = selectedSchool;
-    input.readOnly = state.auth.role === "manager" && Boolean(state.auth.schoolName);
+    input.readOnly = hasAssignedScope();
   });
 }
 
@@ -1164,7 +1196,7 @@ function updateOfficeTypeUI(prefix) {
   const office = prefix === "edit" ? editItemOfficeTypeInput : itemOfficeTypeInput;
   const school = prefix === "edit" ? editItemSchoolNameInput : itemSchoolNameInput;
   if (!office || !school) return;
-  if (state.auth.role === "manager" && state.auth.schoolName) office.value = inferOfficeType(state.auth.schoolName);
+  if (hasAssignedScope()) office.value = inferOfficeType(state.auth.schoolName);
   const showSchool = ["ES", "HS"].includes(office.value);
   const schoolWrap = school.closest("label");
   schoolWrap?.classList.toggle("hidden", !showSchool);
@@ -1219,7 +1251,7 @@ function renderSchoolFilter() {
 
   filterSchool.innerHTML = `<option value="All">All Schools</option>${schoolOptions}`;
 
-  if (state.auth.role === "manager" && state.auth.schoolName) {
+  if (hasAssignedScope()) {
     filterSchool.value = state.auth.schoolName;
     filterSchool.disabled = true;
     return;
