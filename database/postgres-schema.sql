@@ -118,6 +118,7 @@ CREATE INDEX IF NOT EXISTS idx_inventory_items_assigned_teacher_id ON inventory_
 CREATE INDEX IF NOT EXISTS idx_inventory_items_updated_at ON inventory_items (updated_at DESC);
 CREATE INDEX IF NOT EXISTS idx_stock_movements_inventory_item_id ON stock_movements (inventory_item_id);
 CREATE UNIQUE INDEX IF NOT EXISTS idx_app_users_email_unique ON app_users (LOWER(email)) WHERE email <> '';
+ALTER TABLE app_users ENABLE ROW LEVEL SECURITY;
 
 CREATE OR REPLACE VIEW inventory_listing AS
 SELECT
