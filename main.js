@@ -743,6 +743,7 @@ function updateUserAssignmentOptions(selected = "", selectedAssignments = []) {
     const current = selectedAssignments.length ? selectedAssignments : selected ? [selected] : [];
     staffAssignments.innerHTML = [0, 1, 2].map((index) => `<label>School ${index + 1}${index ? " (optional)" : ""}<select data-staff-assignment="${index}" ${index ? "" : "required"}><option value="">Select school</option>${options.map((value) => `<option value="${escapeHtml(value)}" ${current[index] === value ? "selected" : ""}>${escapeHtml(value)}</option>`).join("")}</select></label>`).join("");
   }
+  staffAssignments.querySelectorAll("select").forEach((field) => { field.disabled = !isStaff; });
   summary.textContent = role === "admin"
     ? "Admins can manage all offices and schools."
     : role === "manager"
