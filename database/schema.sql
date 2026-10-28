@@ -109,10 +109,13 @@ CREATE TABLE IF NOT EXISTS app_users (
   last_name TEXT NOT NULL DEFAULT '',
   first_name TEXT NOT NULL DEFAULT '',
   middle_name TEXT NOT NULL DEFAULT '',
+  email TEXT NOT NULL DEFAULT '',
   status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'inactive')),
   created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_app_users_email_unique ON app_users (LOWER(email)) WHERE email <> '';
 
 CREATE VIEW IF NOT EXISTS inventory_listing AS
 SELECT

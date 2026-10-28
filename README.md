@@ -27,6 +27,14 @@ Set these in Vercel:
 - `SUPABASE_URL`
 - `SUPABASE_SERVICE_ROLE_KEY` or `SUPABASE_SECRET_KEY`
 
+To email newly created users, also set:
+
+- `RESEND_API_KEY`
+- `RESEND_FROM_EMAIL` (a verified sender, for example `SAIMS <notifications@your-domain.com>`)
+- `APP_URL=https://saims.depedregion7.com/login.html`
+
+The notification includes the user's username and login link. Temporary passwords are not included in email.
+
 ## Deploy on Vercel
 
 1. Create or link the Supabase project.

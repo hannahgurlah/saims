@@ -688,13 +688,20 @@ function showUserMessage(id, message, isError = false) { const el = document.get
 
 async function initializeUsersPage() {
   const body = document.querySelector("#usersTableBody"); if (!body) return;
+  const headerRow = body.closest("table")?.querySelector("thead tr");
+  if (headerRow && !headerRow.querySelector('[data-user-email-heading]')) {
+    const emailHeading = document.createElement("th");
+    emailHeading.dataset.userEmailHeading = "true";
+    emailHeading.textContent = "Email";
+    headerRow.children[1]?.after(emailHeading);
+  }
   const dashboardPanel = document.querySelector("#dashboardUsersPanel");
-  if (state.auth.role !== "admin") { if (!dashboardPanel) body.innerHTML = '<tr><td colspan="6" class="empty-state">Administrator access is required.</td></tr>'; return; }
+  if (state.auth.role !== "admin") { if (!dashboardPanel) body.innerHTML = '<tr><td colspan="7" class="empty-state">Administrator access is required.</td></tr>'; return; }
   if (dashboardPanel) { dashboardPanel.hidden = false; dashboardPanel.classList.remove("hidden"); }
   try { const users = await apiFetch("/api/users"); document.querySelector("#userCount").textContent = `${users.length} ${users.length === 1 ? "user" : "users"}`;
-    body.innerHTML = users.length ? users.map((u) => `<tr><td><strong>${escapeHtml([u.lastName, u.firstName, u.middleName].filter(Boolean).join(", ") || "—")}</strong></td><td>${escapeHtml(u.username)}</td><td><span class="role-badge role-${escapeHtml(u.role)}">${escapeHtml(u.role)}</span></td><td>${escapeHtml(u.role === "admin" ? "All offices and schools" : u.assignment || "—")}</td><td><span class="status-badge user-status-${escapeHtml(u.status)}">${escapeHtml(u.status)}</span></td><td><div class="user-actions"><a class="primary-btn table-action-btn" href="user-settings.html?id=${encodeURIComponent(u.id)}">Edit</a><button class="ghost-btn table-delete-btn" type="button" data-user-delete="${escapeHtml(u.id)}" data-username="${escapeHtml(u.username)}">Delete</button></div></td></tr>`).join("") : '<tr><td colspan="6" class="empty-state">No registered users found.</td></tr>';
+    body.innerHTML = users.length ? users.map((u) => `<tr><td><strong>${escapeHtml([u.lastName, u.firstName, u.middleName].filter(Boolean).join(", ") || "—")}</strong></td><td>${escapeHtml(u.username)}</td><td>${escapeHtml(u.email || "—")}</td><td><span class="role-badge role-${escapeHtml(u.role)}">${escapeHtml(u.role)}</span></td><td>${escapeHtml(u.role === "admin" ? "All offices and schools" : u.assignment || "—")}</td><td><span class="status-badge user-status-${escapeHtml(u.status)}">${escapeHtml(u.status)}</span></td><td><div class="user-actions"><a class="primary-btn table-action-btn" href="user-settings.html?id=${encodeURIComponent(u.id)}">Edit</a><button class="ghost-btn table-delete-btn" type="button" data-user-delete="${escapeHtml(u.id)}" data-username="${escapeHtml(u.username)}">Delete</button></div></td></tr>`).join("") : '<tr><td colspan="7" class="empty-state">No registered users found.</td></tr>';
     body.querySelectorAll("[data-user-delete]").forEach((button) => button.addEventListener("click", async () => { if (!window.confirm(`Delete user “${button.dataset.username}”? This cannot be undone.`)) return; try { await apiFetch(`/api/users/${encodeURIComponent(button.dataset.userDelete)}`, { method: "DELETE" }); await initializeUsersPage(); } catch (error) { showUserMessage("usersMessage", error.message, true); } }));
-  } catch (error) { body.innerHTML = '<tr><td colspan="6" class="empty-state">Unable to load registered users.</td></tr>'; }
+  } catch (error) { body.innerHTML = '<tr><td colspan="7" class="empty-state">Unable to load registered users.</td></tr>'; }
 }
 
 function updateUserAssignmentOptions(selected = "") { const role = document.querySelector("#userRole")?.value; const wrap = document.querySelector("#userAssignmentWrap"); const select = document.querySelector("#userAssignment"); const summary = document.querySelector("#roleSummary"); if (!wrap || !select) return; wrap.hidden = role === "admin"; select.required = role !== "admin"; const options = USER_ASSIGNMENTS[role] || []; select.innerHTML = '<option value="">Select assignment</option>' + options.map((v) => `<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`).join(""); if (selected && !options.includes(selected)) select.insertAdjacentHTML("beforeend", `<option value="${escapeHtml(selected)}">${escapeHtml(selected)}</option>`); select.value = selected; summary.textContent = role === "admin" ? "Admins can manage all offices and schools." : role === "manager" ? "Managers can manage one specific office and its sub-offices or schools." : "Staff can manage one specific school only."; }
@@ -702,6 +709,10 @@ function updateUserAssignmentOptions(selected = "") { const role = document.quer
 async function initializeUserSettingsPage() {
   const form = document.querySelector("#userSettingsForm"); if (!form) return;
   if (state.auth.role !== "admin") { form.innerHTML = '<div class="empty-state">Administrator access is required.</div>'; return; }
+  const middleNameInput = document.querySelector("#userMiddleName");
+  if (middleNameInput && !document.querySelector("#userEmail")) {
+    middleNameInput.closest("label")?.insertAdjacentHTML("afterend", '<label>Email address<input id="userEmail" type="email" autocomplete="email" required><small>A welcome notification will be sent when the account is created.</small></label>');
+  }
   const id = new URLSearchParams(window.location.search).get("id"); const isCreating = !id;
   const passwordWrap = document.querySelector("#userPasswordWrap"); const passwordInput = document.querySelector("#userPassword");
   passwordWrap.hidden = !isCreating; passwordInput.required = isCreating;
@@ -711,11 +722,11 @@ async function initializeUserSettingsPage() {
     document.querySelector("#userSubmitButton").textContent = "Create user";
     document.querySelector("#userRole").value = "staff"; updateUserAssignmentOptions();
   } else {
-    try { const u = await apiFetch(`/api/users/${encodeURIComponent(id)}`); document.querySelector("#userUsername").value=u.username; document.querySelector("#userLastName").value=u.lastName; document.querySelector("#userFirstName").value=u.firstName; document.querySelector("#userMiddleName").value=u.middleName; document.querySelector("#userRole").value=u.role; document.querySelector("#userStatus").value=u.status; updateUserAssignmentOptions(u.assignment); }
+    try { const u = await apiFetch(`/api/users/${encodeURIComponent(id)}`); document.querySelector("#userUsername").value=u.username; document.querySelector("#userLastName").value=u.lastName; document.querySelector("#userFirstName").value=u.firstName; document.querySelector("#userMiddleName").value=u.middleName; document.querySelector("#userEmail").value=u.email || ""; document.querySelector("#userRole").value=u.role; document.querySelector("#userStatus").value=u.status; updateUserAssignmentOptions(u.assignment); }
     catch(error) { showUserMessage("userSettingsMessage", "Unable to load this user.", true); return; }
   }
   document.querySelector("#userRole").addEventListener("change", () => updateUserAssignmentOptions());
-  form.addEventListener("submit", async (event) => { event.preventDefault(); const payload = { username:document.querySelector("#userUsername").value.trim(), password:passwordInput.value, lastName:document.querySelector("#userLastName").value.trim(), firstName:document.querySelector("#userFirstName").value.trim(), middleName:document.querySelector("#userMiddleName").value.trim(), role:document.querySelector("#userRole").value, status:document.querySelector("#userStatus").value, assignment:document.querySelector("#userAssignment").value }; try { await apiFetch(isCreating ? "/api/users" : `/api/users/${encodeURIComponent(id)}`, { method:isCreating ? "POST" : "PUT", body:JSON.stringify(payload) }); window.location.href="settings.html"; } catch(error) { showUserMessage("userSettingsMessage", error.message, true); } });
+  form.addEventListener("submit", async (event) => { event.preventDefault(); const payload = { username:document.querySelector("#userUsername").value.trim(), password:passwordInput.value, lastName:document.querySelector("#userLastName").value.trim(), firstName:document.querySelector("#userFirstName").value.trim(), middleName:document.querySelector("#userMiddleName").value.trim(), email:document.querySelector("#userEmail").value.trim(), role:document.querySelector("#userRole").value, status:document.querySelector("#userStatus").value, assignment:document.querySelector("#userAssignment").value }; try { const savedUser = await apiFetch(isCreating ? "/api/users" : `/api/users/${encodeURIComponent(id)}`, { method:isCreating ? "POST" : "PUT", body:JSON.stringify(payload) }); if (isCreating) window.alert(savedUser.notificationSent ? "User created and notification email sent." : `User created, but the notification email was not sent. ${savedUser.notificationMessage || ""}`.trim()); window.location.href="settings.html"; } catch(error) { showUserMessage("userSettingsMessage", error.message, true); } });
 }
 
 async function refreshSession() {

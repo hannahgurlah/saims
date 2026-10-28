@@ -108,6 +108,7 @@ CREATE TABLE IF NOT EXISTS app_users (
   last_name TEXT NOT NULL DEFAULT '',
   first_name TEXT NOT NULL DEFAULT '',
   middle_name TEXT NOT NULL DEFAULT '',
+  email TEXT NOT NULL DEFAULT '',
   status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'inactive')),
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -116,6 +117,7 @@ CREATE TABLE IF NOT EXISTS app_users (
 CREATE INDEX IF NOT EXISTS idx_inventory_items_assigned_teacher_id ON inventory_items (assigned_teacher_id);
 CREATE INDEX IF NOT EXISTS idx_inventory_items_updated_at ON inventory_items (updated_at DESC);
 CREATE INDEX IF NOT EXISTS idx_stock_movements_inventory_item_id ON stock_movements (inventory_item_id);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_app_users_email_unique ON app_users (LOWER(email)) WHERE email <> '';
 
 CREATE OR REPLACE VIEW inventory_listing AS
 SELECT
