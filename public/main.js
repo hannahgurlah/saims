@@ -675,6 +675,7 @@ async function initializeApp() {
       return;
     }
     await refreshData();
+    if (isDashboardPage) await initializeUsersPage();
   } catch (error) {
     console.error(error);
     renderErrorState("Unable to load data from the database.");
@@ -687,7 +688,9 @@ function showUserMessage(id, message, isError = false) { const el = document.get
 
 async function initializeUsersPage() {
   const body = document.querySelector("#usersTableBody"); if (!body) return;
-  if (state.auth.role !== "admin") { body.innerHTML = '<tr><td colspan="6" class="empty-state">Administrator access is required.</td></tr>'; return; }
+  const dashboardPanel = document.querySelector("#dashboardUsersPanel");
+  if (state.auth.role !== "admin") { if (!dashboardPanel) body.innerHTML = '<tr><td colspan="6" class="empty-state">Administrator access is required.</td></tr>'; return; }
+  if (dashboardPanel) { dashboardPanel.hidden = false; dashboardPanel.classList.remove("hidden"); }
   try { const users = await apiFetch("/api/users"); document.querySelector("#userCount").textContent = `${users.length} ${users.length === 1 ? "user" : "users"}`;
     body.innerHTML = users.length ? users.map((u) => `<tr><td><strong>${escapeHtml([u.lastName, u.firstName, u.middleName].filter(Boolean).join(", ") || "—")}</strong></td><td>${escapeHtml(u.username)}</td><td><span class="role-badge role-${escapeHtml(u.role)}">${escapeHtml(u.role)}</span></td><td>${escapeHtml(u.role === "admin" ? "All offices and schools" : u.assignment || "—")}</td><td><span class="status-badge user-status-${escapeHtml(u.status)}">${escapeHtml(u.status)}</span></td><td><div class="user-actions"><a class="primary-btn table-action-btn" href="user-settings.html?id=${encodeURIComponent(u.id)}">Edit</a><button class="ghost-btn table-delete-btn" type="button" data-user-delete="${escapeHtml(u.id)}" data-username="${escapeHtml(u.username)}">Delete</button></div></td></tr>`).join("") : '<tr><td colspan="6" class="empty-state">No registered users found.</td></tr>';
     body.querySelectorAll("[data-user-delete]").forEach((button) => button.addEventListener("click", async () => { if (!window.confirm(`Delete user “${button.dataset.username}”? This cannot be undone.`)) return; try { await apiFetch(`/api/users/${encodeURIComponent(button.dataset.userDelete)}`, { method: "DELETE" }); await initializeUsersPage(); } catch (error) { showUserMessage("usersMessage", error.message, true); } }));
