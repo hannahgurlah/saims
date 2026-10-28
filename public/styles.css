@@ -1,7 +1,7 @@
 :root {
   --bg: #f7f9fd;
   --sidebar: #06265a;
-  --sidebar-soft: #0b3778;
+  --sidebar-soft: #06265a;
   --panel: #ffffff;
   --panel-strong: #ffffff;
   --text: #08224d;
@@ -392,7 +392,7 @@ h3 {
 }
 
 .panel {
-  padding: 20px 25px;
+  padding: 0;
   overflow: hidden;
 }
 
@@ -967,6 +967,8 @@ a.table-action-btn { text-decoration: none; }
   text-align: center;
   color: var(--muted);
 }
+.section-heading,.user-actions,.form-actions{display:flex;align-items:center;justify-content:space-between;gap:12px}.record-count{color:var(--muted);font-weight:600}.users-table{min-width:880px}.user-actions{justify-content:flex-start}.role-badge{display:inline-flex;padding:6px 10px;border-radius:999px;font-size:.78rem;font-weight:700;text-transform:capitalize;background:var(--navy-soft);color:var(--navy)}.role-admin{background:#fff3e8;color:#b54708}.role-manager{background:#eef4ff;color:#3538cd}.role-staff{background:#ecfdf3;color:#027a48}.user-status-active{background:#ecfdf5;color:#047857;border-color:#c6f6dc;text-transform:capitalize}.user-status-inactive{background:#fef2f2;color:#b42318;border-color:#ffd2d2;text-transform:capitalize}.user-settings-card{max-width:920px}.form-section+.form-section{border-top:1px solid var(--line);padding-top:24px}.field-wide{grid-column:1/-1}.role-summary{margin-top:14px;padding:14px 16px;border-radius:var(--radius);color:var(--navy);background:var(--navy-soft)}.button-link{display:inline-flex;align-items:center;justify-content:center;text-decoration:none}.form-message{margin-bottom:16px;padding:12px 14px;border-radius:var(--radius);background:#ecfdf5;color:#047857}.form-message.error{background:#fef2f2;color:#b42318}
+.section-actions{display:flex;align-items:center;gap:12px}
 
 @media (max-width: 920px) {
   :root {
