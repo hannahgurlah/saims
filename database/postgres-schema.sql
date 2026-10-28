@@ -105,6 +105,7 @@ CREATE TABLE IF NOT EXISTS app_users (
   password_hash TEXT NOT NULL,
   role TEXT NOT NULL CHECK (role IN ('admin', 'manager', 'supervisor', 'staff')),
   school_name TEXT NOT NULL DEFAULT '',
+  school_names TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[] CHECK (cardinality(school_names) <= 3),
   last_name TEXT NOT NULL DEFAULT '',
   first_name TEXT NOT NULL DEFAULT '',
   middle_name TEXT NOT NULL DEFAULT '',

@@ -4,6 +4,7 @@ const state = {
     username: "",
     role: "",
     schoolName: "",
+    schoolNames: [],
   },
   teachers: [],
   inventory: [],
@@ -689,8 +690,12 @@ const USER_ASSIGNMENTS = {
   staff: SCHOOL_ASSIGNMENTS,
 };
 
+function getAssignedSchools() {
+  return [...new Set([...(state.auth.schoolNames || []), state.auth.schoolName].filter(Boolean))];
+}
+
 function hasAssignedScope() {
-  return ["manager", "supervisor", "staff"].includes(state.auth.role) && Boolean(state.auth.schoolName);
+  return ["manager", "supervisor", "staff"].includes(state.auth.role) && getAssignedSchools().length > 0;
 }
 
 function showUserMessage(id, message, isError = false) { const el = document.getElementById(id); if (!el) return; el.textContent = message; el.classList.remove("hidden"); el.classList.toggle("error", isError); }
@@ -708,12 +713,12 @@ async function initializeUsersPage() {
   if (state.auth.role !== "admin") { if (!dashboardPanel) body.innerHTML = '<tr><td colspan="7" class="empty-state">Administrator access is required.</td></tr>'; return; }
   if (dashboardPanel) { dashboardPanel.hidden = false; dashboardPanel.classList.remove("hidden"); }
   try { const users = await apiFetch("/api/users"); document.querySelector("#userCount").textContent = `${users.length} ${users.length === 1 ? "user" : "users"}`;
-    body.innerHTML = users.length ? users.map((u) => `<tr><td><strong>${escapeHtml([u.lastName, u.firstName, u.middleName].filter(Boolean).join(", ") || "—")}</strong></td><td>${escapeHtml(u.username)}</td><td>${escapeHtml(u.email || "—")}</td><td><span class="role-badge role-${escapeHtml(u.role)}">${escapeHtml(u.role)}</span></td><td>${escapeHtml(u.role === "admin" ? "All offices and schools" : u.assignment || "—")}</td><td><span class="status-badge user-status-${escapeHtml(u.status)}">${escapeHtml(u.status)}</span></td><td><div class="user-actions"><a class="primary-btn table-action-btn" href="user-settings.html?id=${encodeURIComponent(u.id)}">Edit</a><button class="ghost-btn table-delete-btn" type="button" data-user-delete="${escapeHtml(u.id)}" data-username="${escapeHtml(u.username)}">Delete</button></div></td></tr>`).join("") : '<tr><td colspan="7" class="empty-state">No registered users found.</td></tr>';
+    body.innerHTML = users.length ? users.map((u) => `<tr><td><strong>${escapeHtml([u.lastName, u.firstName, u.middleName].filter(Boolean).join(", ") || "—")}</strong></td><td>${escapeHtml(u.username)}</td><td>${escapeHtml(u.email || "—")}</td><td><span class="role-badge role-${escapeHtml(u.role)}">${escapeHtml(u.role)}</span></td><td>${escapeHtml(u.role === "admin" ? "All offices and schools" : (u.assignments || [u.assignment]).filter(Boolean).join(", ") || "—")}</td><td><span class="status-badge user-status-${escapeHtml(u.status)}">${escapeHtml(u.status)}</span></td><td><div class="user-actions"><a class="primary-btn table-action-btn" href="user-settings.html?id=${encodeURIComponent(u.id)}">Edit</a><button class="ghost-btn table-delete-btn" type="button" data-user-delete="${escapeHtml(u.id)}" data-username="${escapeHtml(u.username)}">Delete</button></div></td></tr>`).join("") : '<tr><td colspan="7" class="empty-state">No registered users found.</td></tr>';
     body.querySelectorAll("[data-user-delete]").forEach((button) => button.addEventListener("click", async () => { if (!window.confirm(`Delete user “${button.dataset.username}”? This cannot be undone.`)) return; try { await apiFetch(`/api/users/${encodeURIComponent(button.dataset.userDelete)}`, { method: "DELETE" }); await initializeUsersPage(); } catch (error) { showUserMessage("usersMessage", error.message, true); } }));
   } catch (error) { body.innerHTML = '<tr><td colspan="7" class="empty-state">Unable to load registered users.</td></tr>'; }
 }
 
-function updateUserAssignmentOptions(selected = "") {
+function updateUserAssignmentOptions(selected = "", selectedAssignments = []) {
   const role = document.querySelector("#userRole")?.value;
   const wrap = document.querySelector("#userAssignmentWrap");
   const select = document.querySelector("#userAssignment");
@@ -725,13 +730,26 @@ function updateUserAssignmentOptions(selected = "") {
   select.innerHTML = '<option value="">Select assignment</option>' + options.map((v) => `<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`).join("");
   if (selected && !options.includes(selected)) select.insertAdjacentHTML("beforeend", `<option value="${escapeHtml(selected)}">${escapeHtml(selected)}</option>`);
   select.value = selected;
+  let staffAssignments = document.querySelector("#staffAssignments");
+  if (!staffAssignments) {
+    select.insertAdjacentHTML("afterend", '<div id="staffAssignments" class="staff-assignments"></div>');
+    staffAssignments = document.querySelector("#staffAssignments");
+  }
+  const isStaff = role === "staff";
+  select.hidden = isStaff;
+  select.required = !isStaff && role !== "admin";
+  staffAssignments.hidden = !isStaff;
+  if (isStaff) {
+    const current = selectedAssignments.length ? selectedAssignments : selected ? [selected] : [];
+    staffAssignments.innerHTML = [0, 1, 2].map((index) => `<label>School ${index + 1}${index ? " (optional)" : ""}<select data-staff-assignment="${index}" ${index ? "" : "required"}><option value="">Select school</option>${options.map((value) => `<option value="${escapeHtml(value)}" ${current[index] === value ? "selected" : ""}>${escapeHtml(value)}</option>`).join("")}</select></label>`).join("");
+  }
   summary.textContent = role === "admin"
     ? "Admins can manage all offices and schools."
     : role === "manager"
       ? "Managers can manage one specific office and its sub-offices or schools."
       : role === "supervisor"
         ? "Supervisors are School Heads who can manage one assigned school or office only."
-        : "Staff can manage one specific school only.";
+        : "Staff can manage up to three assigned schools.";
 }
 
 async function initializeUserSettingsPage() {
@@ -754,11 +772,11 @@ async function initializeUserSettingsPage() {
     document.querySelector("#userSubmitButton").textContent = "Create user";
     document.querySelector("#userRole").value = "staff"; updateUserAssignmentOptions();
   } else {
-    try { const u = await apiFetch(`/api/users/${encodeURIComponent(id)}`); document.querySelector("#userUsername").value=u.username; document.querySelector("#userLastName").value=u.lastName; document.querySelector("#userFirstName").value=u.firstName; document.querySelector("#userMiddleName").value=u.middleName; document.querySelector("#userEmail").value=u.email || ""; document.querySelector("#userRole").value=u.role; document.querySelector("#userStatus").value=u.status; updateUserAssignmentOptions(u.assignment); }
+    try { const u = await apiFetch(`/api/users/${encodeURIComponent(id)}`); document.querySelector("#userUsername").value=u.username; document.querySelector("#userLastName").value=u.lastName; document.querySelector("#userFirstName").value=u.firstName; document.querySelector("#userMiddleName").value=u.middleName; document.querySelector("#userEmail").value=u.email || ""; document.querySelector("#userRole").value=u.role; document.querySelector("#userStatus").value=u.status; updateUserAssignmentOptions(u.assignment, u.assignments || []); }
     catch(error) { showUserMessage("userSettingsMessage", "Unable to load this user.", true); return; }
   }
   document.querySelector("#userRole").addEventListener("change", () => updateUserAssignmentOptions());
-  form.addEventListener("submit", async (event) => { event.preventDefault(); const payload = { username:document.querySelector("#userUsername").value.trim(), password:passwordInput.value, lastName:document.querySelector("#userLastName").value.trim(), firstName:document.querySelector("#userFirstName").value.trim(), middleName:document.querySelector("#userMiddleName").value.trim(), email:document.querySelector("#userEmail").value.trim(), role:document.querySelector("#userRole").value, status:document.querySelector("#userStatus").value, assignment:document.querySelector("#userAssignment").value }; try { const savedUser = await apiFetch(isCreating ? "/api/users" : `/api/users/${encodeURIComponent(id)}`, { method:isCreating ? "POST" : "PUT", body:JSON.stringify(payload) }); if (isCreating) window.alert(savedUser.notificationSent ? "User created and notification email sent." : `User created, but the notification email was not sent. ${savedUser.notificationMessage || ""}`.trim()); window.location.href="settings.html"; } catch(error) { showUserMessage("userSettingsMessage", error.message, true); } });
+  form.addEventListener("submit", async (event) => { event.preventDefault(); const assignments = [...document.querySelectorAll("[data-staff-assignment]")].map((field) => field.value).filter(Boolean); if (new Set(assignments).size !== assignments.length) { showUserMessage("userSettingsMessage", "Each staff school assignment must be different.", true); return; } const payload = { username:document.querySelector("#userUsername").value.trim(), password:passwordInput.value, lastName:document.querySelector("#userLastName").value.trim(), firstName:document.querySelector("#userFirstName").value.trim(), middleName:document.querySelector("#userMiddleName").value.trim(), email:document.querySelector("#userEmail").value.trim(), role:document.querySelector("#userRole").value, status:document.querySelector("#userStatus").value, assignment:document.querySelector("#userAssignment").value, assignments }; try { const savedUser = await apiFetch(isCreating ? "/api/users" : `/api/users/${encodeURIComponent(id)}`, { method:isCreating ? "POST" : "PUT", body:JSON.stringify(payload) }); if (isCreating) window.alert(savedUser.notificationSent ? "User created and notification email sent." : `User created, but the notification email was not sent. ${savedUser.notificationMessage || ""}`.trim()); window.location.href="settings.html"; } catch(error) { showUserMessage("userSettingsMessage", error.message, true); } });
 }
 
 async function refreshSession() {
@@ -768,6 +786,7 @@ async function refreshSession() {
     username: session && session.username ? session.username : "",
     role: session && session.role ? session.role : "",
     schoolName: session && session.schoolName ? session.schoolName : "",
+    schoolNames: session && Array.isArray(session.schoolNames) ? session.schoolNames : [],
   };
 }
 
@@ -1124,7 +1143,7 @@ function buildTeacherOptionsForSchool(schoolName) {
 
 function getSchoolNames() {
   if (hasAssignedScope()) {
-    return [state.auth.schoolName];
+    return getAssignedSchools();
   }
 
   return [...new Set([
@@ -1160,8 +1179,9 @@ function renderSchoolAutocomplete() {
     .join("");
 
   schoolInputs.forEach((input) => {
-    const selectedSchool = hasAssignedScope()
-      ? state.auth.schoolName
+    const assignedSchools = getAssignedSchools();
+    const selectedSchool = hasAssignedScope() && assignedSchools.length === 1
+      ? assignedSchools[0]
       : input.value || "";
 
     if (input.tagName === "SELECT") {
@@ -1172,13 +1192,13 @@ function renderSchoolAutocomplete() {
         ...availableSchools.map((schoolName) => `<option value="${escapeHtml(schoolName)}">${escapeHtml(schoolName)}</option>`),
       ].join("");
       input.value = availableSchools.includes(selectedSchool) ? selectedSchool : "";
-      input.disabled = hasAssignedScope();
+      input.disabled = hasAssignedScope() && assignedSchools.length === 1;
       return;
     }
 
     input.setAttribute("list", "schoolNameOptions");
     input.value = selectedSchool;
-    input.readOnly = hasAssignedScope();
+    input.readOnly = hasAssignedScope() && assignedSchools.length === 1;
   });
 }
 
@@ -1189,14 +1209,15 @@ function inferOfficeType(name) {
 }
 
 function getSchoolsForOfficeType(type, names = getSchoolNames()) {
-  return Object.keys(type === "ES" ? ELEMENTARY_SCHOOL_CODES : HIGH_SCHOOL_CODES);
+  const schools = Object.keys(type === "ES" ? ELEMENTARY_SCHOOL_CODES : HIGH_SCHOOL_CODES);
+  return hasAssignedScope() ? schools.filter((school) => names.includes(school)) : schools;
 }
 
 function updateOfficeTypeUI(prefix) {
   const office = prefix === "edit" ? editItemOfficeTypeInput : itemOfficeTypeInput;
   const school = prefix === "edit" ? editItemSchoolNameInput : itemSchoolNameInput;
   if (!office || !school) return;
-  if (hasAssignedScope()) office.value = inferOfficeType(state.auth.schoolName);
+  if (hasAssignedScope() && getAssignedSchools().length === 1) office.value = inferOfficeType(getAssignedSchools()[0]);
   const showSchool = ["ES", "HS"].includes(office.value);
   const schoolWrap = school.closest("label");
   schoolWrap?.classList.toggle("hidden", !showSchool);
@@ -1252,8 +1273,9 @@ function renderSchoolFilter() {
   filterSchool.innerHTML = `<option value="All">All Schools</option>${schoolOptions}`;
 
   if (hasAssignedScope()) {
-    filterSchool.value = state.auth.schoolName;
-    filterSchool.disabled = true;
+    const assignedSchools = getAssignedSchools();
+    filterSchool.value = assignedSchools.includes(selectedSchool) ? selectedSchool : assignedSchools[0];
+    filterSchool.disabled = assignedSchools.length === 1;
     return;
   }
 
