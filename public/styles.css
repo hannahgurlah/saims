@@ -542,6 +542,12 @@ h3 {
   font-weight: 700;
 }
 
+.field-help {
+  margin: -6px 0 0;
+  color: #667085;
+  font-size: 0.82rem;
+}
+
 .bundle-item-lines {
   display: grid;
   gap: 10px;
@@ -549,7 +555,7 @@ h3 {
 
 .bundle-item-line {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(110px, 0.25fr) auto;
+  grid-template-columns: minmax(0, 1fr) minmax(90px, 0.2fr) minmax(130px, 0.25fr) auto;
   gap: 10px;
   align-items: end;
 }

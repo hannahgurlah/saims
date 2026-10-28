@@ -2907,7 +2907,11 @@ function getBundleItems(value) {
     const parsed = JSON.parse(value || "[]");
     if (Array.isArray(parsed)) {
       return parsed
-        .map((item) => ({ name: String(item.name || "").trim(), quantity: Math.max(1, Number(item.quantity) || 1) }))
+        .map((item) => ({
+          name: String(item.name || "").trim(),
+          quantity: Math.max(1, Number(item.quantity) || 1),
+          price: Math.max(0, Number(item.price) || 0),
+        }))
         .filter((item) => item.name);
     }
   } catch {
@@ -2916,7 +2920,7 @@ function getBundleItems(value) {
 
   return String(value || "")
     .split("\n")
-    .map((name) => ({ name: name.trim(), quantity: 1 }))
+    .map((name) => ({ name: name.trim(), quantity: 1, price: 0 }))
     .filter((item) => item.name);
 }
 
@@ -2931,6 +2935,7 @@ function getBundleItemsValue(prefix) {
   const items = [...lines.querySelectorAll(".bundle-item-line")].map((line) => ({
     name: line.querySelector('[data-bundle-field="name"]').value.trim(),
     quantity: Math.max(1, Number(line.querySelector('[data-bundle-field="quantity"]').value) || 1),
+    price: Math.max(0, Number(line.querySelector('[data-bundle-field="price"]').value) || 0),
   }));
 
   return JSON.stringify(items);
@@ -2958,7 +2963,7 @@ function updateBundleItemsUI(prefix) {
   }
 }
 
-function addBundleItemLine(prefix, item = { name: "", quantity: 1 }) {
+function addBundleItemLine(prefix, item = { name: "", quantity: 1, price: 0 }) {
   const lines = prefix === "edit" ? editItemBundleItemLines : itemBundleItemLines;
   if (!lines) {
     return;
@@ -2972,8 +2977,12 @@ function addBundleItemLine(prefix, item = { name: "", quantity: 1 }) {
       <input type="text" data-bundle-field="name" value="${escapeHtmlAttribute(item.name || "")}" required>
     </label>
     <label>
-      <span>Quantity</span>
+      <span>Qty</span>
       <input type="number" data-bundle-field="quantity" min="1" value="${Math.max(1, Number(item.quantity) || 1)}" required>
+    </label>
+    <label>
+      <span>Unit Price</span>
+      <input type="number" data-bundle-field="price" min="0" step="0.01" value="${Math.max(0, Number(item.price) || 0)}" required>
     </label>
     <button class="ghost-btn" type="button" data-action="remove-bundle-item">Remove</button>
   `;
