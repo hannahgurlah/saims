@@ -711,7 +711,7 @@ async function initializeUserSettingsPage() {
   if (state.auth.role !== "admin") { form.innerHTML = '<div class="empty-state">Administrator access is required.</div>'; return; }
   const middleNameInput = document.querySelector("#userMiddleName");
   if (middleNameInput && !document.querySelector("#userEmail")) {
-    middleNameInput.closest("label")?.insertAdjacentHTML("afterend", '<label>Email address<input id="userEmail" type="email" autocomplete="email" required><small>A welcome notification will be sent when the account is created.</small></label>');
+    middleNameInput.closest("label")?.insertAdjacentHTML("afterend", '<label class="field-wide user-email-field">Email address<input id="userEmail" type="email" autocomplete="email" placeholder="name@example.com" required><small>A welcome notification will be sent when the account is created.</small></label>');
   }
   const id = new URLSearchParams(window.location.search).get("id"); const isCreating = !id;
   const passwordWrap = document.querySelector("#userPasswordWrap"); const passwordInput = document.querySelector("#userPassword");
